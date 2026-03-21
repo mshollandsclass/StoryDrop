@@ -1191,10 +1191,11 @@ async function studentPoll() {
     const isMyTurn = g.players[g.currentPlayerIdx] === me.name;
     const phase = g.phase || 'write';
     if (phase === 'write') {
-      if (isMyTurn && curView !== 'v-write') { startWriteTurn(g); }
-      else if (!isMyTurn) {
+      const alreadySubmitted = (g.roundContribs||[]).some(c => c.playerName === me.name && c.round === g.currentRound);
+      if (isMyTurn && !alreadySubmitted && curView !== 'v-write') { startWriteTurn(g); }
+      else if (!isMyTurn || alreadySubmitted) {
         document.getElementById('wait-code').textContent = me.groupCode;
-        document.getElementById('wait-msg').textContent = `Waiting for ${g.players[g.currentPlayerIdx]} to write…`;
+        document.getElementById('wait-msg').textContent = alreadySubmitted ? 'Waiting for other players to finish writing…' : `Waiting for ${g.players[g.currentPlayerIdx]} to write…`;
         const submitted = (g.roundContribs||[]).map(c=>c.playerName);
         document.getElementById('wait-players').innerHTML = g.players.map(p => `<div class="chip ${submitted.includes(p)?'me':''}">${p} ${submitted.includes(p)?'✓':''}</div>`).join('');
         if (curView !== 'v-wait') showView('v-wait');
