@@ -458,17 +458,6 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <div class="field-label">Group code</div>
       <input type="text" id="join-code" placeholder="e.g. XK4R2T" maxlength="8" style="text-transform:uppercase;font-family:'Courier Prime',monospace;font-size:1.4rem;letter-spacing:.2em">
     </div>
-    <div class="card" style="margin-bottom:14px;font-size:1rem;line-height:1.8;color:var(--text2)">
-      <div class="label" style="margin-bottom:8px">Quick Rules</div>
-      <div>✍ Write a sentence using your vocab word correctly</div>
-      <div>🗳 Vote on whether teammates used their words correctly</div>
-      <div style="margin-top:4px;padding-top:8px;border-top:1px solid var(--border)">
-        <span style="color:var(--text);font-weight:600">Points:</span>
-        <span style="color:var(--text)">+1</span> word used correctly &nbsp;·&nbsp;
-        <span style="color:var(--text)">+1</span> accurate vote &nbsp;·&nbsp;
-        <span style="color:var(--red)">−1</span> wrong vote
-      </div>
-    </div>
     <div class="btn-row mt-8">
       <button class="btn btn-primary btn-lg" onclick="joinGame()">Join &#x2192;</button>
       <button class="btn btn-secondary btn-md" onclick="showView('v-landing')">&#x2190; Back</button>
@@ -1170,9 +1159,24 @@ async function joinGame() {
   await sset(`sd_group_${code}`, g);
   document.getElementById('lobby-code').textContent = code;
   document.getElementById('lobby-myname').textContent = name;
-  if (!localStorage.getItem('sd_rules_seen')) { localStorage.setItem('sd_rules_seen', '1'); showView('v-rules'); }
-  else { showView('v-lobby'); }
+  showView('v-rules');
   startStudentPoll();
+}
+
+async function rulesGotIt() {
+  if (!me.groupCode) { showView('v-lobby'); return; }
+  const g = await sget(`sd_group_${me.groupCode}`);
+  if (!g) { showView('v-lobby'); return; }
+  if (g.status === 'playing') {
+    const isMyTurn = g.players[g.currentPlayerIdx] === me.name;
+    const alreadySubmitted = (g.roundContribs||[]).some(c => c.playerName === me.name && c.round === g.currentRound);
+    if (isMyTurn && !alreadySubmitted) { startWriteTurn(g); return; }
+    const phase = g.phase || 'write';
+    if (phase === 'vote') { startVoteTurn(g); return; }
+    showView('v-wait');
+  } else {
+    showView('v-lobby');
+  }
 }
 
 function showJoinError(msg) { const el = document.getElementById('join-error'); el.textContent = msg; el.style.display = 'block'; }
@@ -1190,6 +1194,11 @@ async function studentPoll() {
   if (g.status === 'playing') {
     const isMyTurn = g.players[g.currentPlayerIdx] === me.name;
     const phase = g.phase || 'write';
+    // If player is still in lobby, move them along
+    if (curView === 'v-lobby' || curView === 'v-rules') {
+      if (phase === 'write' && isMyTurn) { startWriteTurn(g); return; }
+      if (phase === 'write' && !isMyTurn) { showView('v-wait'); document.getElementById('wait-code').textContent = me.groupCode; document.getElementById('wait-msg').textContent = `Waiting for ${g.players[g.currentPlayerIdx]} to write…`; return; }
+    }
     if (phase === 'write') {
       const alreadySubmitted = (g.roundContribs||[]).some(c => c.playerName === me.name && c.round === g.currentRound);
       if (isMyTurn && !alreadySubmitted && curView !== 'v-write') { startWriteTurn(g); }
