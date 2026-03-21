@@ -1118,7 +1118,8 @@ function renderDashGrid(codes, groups) {
     }).join('');
     const teamScoreDisplay = g.status === 'done' && g.results ? `<div style="font-family:'Courier Prime',monospace;font-size:1.3rem;color:var(--accent);margin-top:6px">${g.results.teamScore || 0} team pts</div>` : '';
     const startBtn = g.status === 'waiting' && (g.players||[]).length >= 1 ? `<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="startGroupGame('${code}')">Start ▶</button>` : '';
-    return `<div class="group-card ${cls}"><div class="gc-code">${code}</div><div class="gc-status ${cls}">${statusLabel}</div><div class="gc-players">${playerStatuses}</div>${teamScoreDisplay}${startBtn}</div>`;
+    const endBtn = g.status === 'playing' ? `<button class="btn btn-danger btn-sm" style="margin-top:10px" onclick="endGroupGame('${code}')">End Game ■</button>` : '';
+    return `<div class="group-card ${cls}"><div class="gc-code">${code}</div><div class="gc-status ${cls}">${statusLabel}</div><div class="gc-players">${playerStatuses}</div>${teamScoreDisplay}${startBtn}${endBtn}</div>`;
   }).join('');
   const anyDone = Object.values(groups).some(g => g.status === 'done');
   const btn = document.getElementById('present-btn');
@@ -1432,6 +1433,16 @@ function showFinal(g) {
   const words = (g.story||[]).filter(s=>s.word).map(s=>s.word);
   document.getElementById('final-words').innerHTML = [...new Set(words)].map(w => `<span class="word-chip">${w}</span>`).join('');
   showView('v-final');
+}
+
+async function endGroupGame(code) {
+  if (!confirm(`Force-end game for group ${code}?`)) return;
+  const g = await sget(`sd_group_${code}`);
+  if (!g) return;
+  g.status = 'done'; g.phase = 'done';
+  g.results = { story: g.story, scores: g.scores, teamScore: g.teamScore || 0, verdicts: g._roundVerdicts || [], wordVotes: g.wordVotes || {}, players: g.players, completedAt: Date.now() };
+  await sset(`sd_group_${code}`, g);
+  toast(`Group ${code} ended`);
 }
 
 async function startGroupGame(code) {
