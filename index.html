@@ -311,14 +311,14 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <p class="intro">Build a story together, one sentence at a time. Each player gets a vocab word to use correctly — the group votes on correct usage — correct answers and accurate votes earn team points, wrong votes lose them. AI keeps everyone honest.</p>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:28px" id="landing-grid">
       <div class="card" style="border-color:var(--accent)">
-        <div class="label">I'm a teacher</div>
-        <div style="font-size:.85rem;color:#aaa;margin-bottom:16px;line-height:1.6">Create a session, share group codes, and monitor all results live.</div>
+        <div class="label">I'm an Educator/Admin</div>
+        <div style="font-size:.85rem;color:#aaa;margin-bottom:16px;line-height:1.6">Create a session, share group codes, and monitor all results live from the Admin Dashboard.</div>
         <button class="btn btn-primary btn-md" onclick="teacherEntry()" data-t="create_session">Create Session</button>
         <div id="license-status-landing" style="font-size:.65rem;margin-top:10px;color:var(--text2)"></div>
       </div>
       <div class="card">
         <div class="label">I'm a student</div>
-        <div style="font-size:.85rem;color:#aaa;margin-bottom:16px;line-height:1.6">Enter the group code your teacher gave you to join your group's game.</div>
+        <div style="font-size:.85rem;color:#aaa;margin-bottom:16px;line-height:1.6">Enter the group code your Educator/Admin gave you to join your group's game.</div>
         <button class="btn btn-secondary btn-md" onclick="showView('v-student-join')" data-t="join_game">Join Game</button>
       </div>
     </div>
@@ -329,9 +329,9 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 <div class="view" id="v-license">
   <div class="view-inner" style="max-width:480px">
     <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="label mt-24">Teacher License</div>
+    <div class="label mt-24">Educator/Admin License</div>
     <p class="text-muted" style="line-height:1.8;margin-bottom:24px">
-      Enter your license key to unlock teacher mode.<br>
+      Enter your license key to unlock Educator/Admin mode.<br>
       Don't have one yet?
       <a href="https://johnalynn.gumroad.com/l/storydrop" target="_blank" style="color:var(--accent)">Get Story Drop on Gumroad</a> — pay what you want.
     </p>
@@ -339,7 +339,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <input id="license-input" class="field" type="text" placeholder="Paste your license key here" autocomplete="off" style="font-size:.85rem;letter-spacing:.05em">
     </div>
     <div id="license-error" class="text-muted" style="color:var(--red);margin-bottom:14px;font-size:.8rem;min-height:20px"></div>
-    <button class="btn btn-primary btn-lg" id="license-btn" onclick="submitLicense()" style="width:100%">Unlock Teacher Mode →</button>
+    <button class="btn btn-primary btn-lg" id="license-btn" onclick="submitLicense()" style="width:100%">Unlock Educator/Admin Mode →</button>
     <p class="text-muted" style="margin-top:20px;font-size:.75rem;line-height:1.7">
       Your key is saved to this browser — you only need to enter it once per device.
     </p>
@@ -349,7 +349,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 <div class="view" id="v-teacher-setup">
   <div class="hdr" style="max-width:780px;width:100%">
     <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">Teacher Setup</div>
+    <div class="hdr-meta">Educator/Admin Setup</div>
   </div>
   <div class="content">
     <div class="label">Current Session</div>
@@ -416,7 +416,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 <div class="view" id="v-teacher-dash">
   <div class="hdr" style="max-width:980px;width:100%">
     <div class="logo">STORY<br><span>DROP</span></div>
-    <div class="hdr-meta">Teacher Dashboard<br><strong id="dash-session-name">—</strong></div>
+    <div class="hdr-meta">Admin Dashboard<br><strong id="dash-session-name">—</strong></div>
   </div>
   <div style="width:100%;max-width:980px">
     <div class="label">Live Groups</div>
@@ -495,7 +495,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="waiting-wrap">
       <div class="waiting-icon">⏳</div>
       <div class="waiting-title">You're in, <span id="lobby-myname">—</span>!</div>
-      <div class="waiting-sub" id="lobby-sub">Waiting for your teacher to start the game.<br>Other players in your group:</div>
+      <div class="waiting-sub" id="lobby-sub">Waiting for your Educator/Admin to start the game.<br>Other players in your group:</div>
     </div>
     <div class="player-chips" id="lobby-players"></div>
     <button class="btn btn-secondary btn-sm" style="margin-top:24px" onclick="leaveGroup()">Wrong group? Leave →</button>
@@ -710,7 +710,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 
     <!-- GENRES TAB -->
     <div id="ss-genres-tab">
-      <p class="text-muted" style="margin-bottom:16px;line-height:1.7">Edit the opening sentences for each default genre. These are used when a teacher picks a genre on the setup page.</p>
+      <p class="text-muted" style="margin-bottom:16px;line-height:1.7">Edit the opening sentences for each default genre. These are used when an Educator/Admin picks a genre on the setup page.</p>
       <div class="genre-row" id="ss-genre-row">
         <button class="genre-btn sel" data-g="horror" onclick="selectSSGenre('horror')">Horror</button>
         <button class="genre-btn" data-g="romance" onclick="selectSSGenre('romance')">Romance</button>
@@ -757,16 +757,141 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
 
 <!-- ══════════ SUPPORT ══════════ -->
 <div class="view" id="v-support">
-  <div class="hdr" style="max-width:680px;width:100%">
+  <div class="hdr" style="max-width:780px;width:100%">
     <div class="logo">STORY<br><span>DROP</span></div>
     <div class="hdr-meta">Support</div>
   </div>
-  <div class="content" style="max-width:680px;width:100%">
-    <div class="card" style="margin-bottom:16px">
-      <div class="label" style="margin-bottom:12px">🚧 Coming Soon</div>
-      <p style="font-size:1rem;line-height:1.8;color:var(--text2)">Full troubleshooting guides and support resources will be available here once the game is finalized.</p>
-      <p style="font-size:1rem;line-height:1.8;color:var(--text2);margin-top:12px">In the meantime, if you have an issue please note the group code, what screen you were on, and what happened — that information helps diagnose problems quickly.</p>
+  <div class="content" style="max-width:780px;width:100%">
+
+    <!-- QUICK NAV -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:28px">
+      <a href="#setup" style="font-family:'Courier Prime',monospace;font-size:.85rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--border);padding:5px 12px;text-decoration:none">Setup</a>
+      <a href="#running" style="font-family:'Courier Prime',monospace;font-size:.85rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--border);padding:5px 12px;text-decoration:none">Running a Game</a>
+      <a href="#reviewing" style="font-family:'Courier Prime',monospace;font-size:.85rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--border);padding:5px 12px;text-decoration:none">Reviewing</a>
+      <a href="#scoring" style="font-family:'Courier Prime',monospace;font-size:.85rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--border);padding:5px 12px;text-decoration:none">Scoring</a>
+      <a href="#troubleshooting" style="font-family:'Courier Prime',monospace;font-size:.85rem;letter-spacing:.1em;color:var(--accent);border:1px solid var(--border);padding:5px 12px;text-decoration:none">Troubleshooting</a>
     </div>
+
+    <!-- SETUP -->
+    <div id="setup" class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:12px">🚀 Setup</div>
+      <div style="font-size:1rem;line-height:1.9;color:var(--text)">
+        <p style="margin-bottom:10px"><strong>1. Enter your license key</strong> — Click <em>Create Session</em> on the home screen and enter your Gumroad license key. It saves to your browser so you only need to do this once per device.</p>
+        <p style="margin-bottom:10px"><strong>2. Create a session</strong> — Go to Educator/Admin Setup and fill in:
+          <br>• Session name (e.g. "Period 3 — Unit 4")
+          <br>• Number of players per group (how many students per small group)
+          <br>• Number of groups (how many groups in the class)
+          <br>• Genre or Custom Topic for the story
+          <br>• Vocabulary words (one per line, or with definitions)
+        </p>
+        <p style="margin-bottom:10px"><strong>3. Vocabulary word format</strong> — You can paste words in two formats:
+          <br>• Simple: <code style="background:var(--surface);padding:1px 6px">ephemeral</code>
+          <br>• Full: <code style="background:var(--surface);padding:1px 6px">ephemeral | adj. | lasting for a very short time | The ephemeral beauty of the sunset.</code>
+        </p>
+        <p style="margin-bottom:10px"><strong>4. Hit Start</strong> — The dashboard opens with a code for each group. Share each code with the students in that group. Students go to the game URL, click <em>Join Game</em>, enter their name and group code.</p>
+        <p><strong>5. Save sessions</strong> — Use the <em>Save</em> button to store your vocab list and settings for reuse. Load them from <em>Menu → Saved Sessions</em> next time.</p>
+      </div>
+    </div>
+
+    <!-- RUNNING -->
+    <div id="running" class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:12px">🎮 Running a Game</div>
+      <div style="font-size:1rem;line-height:1.9;color:var(--text)">
+        <p style="margin-bottom:10px"><strong>Starting a group</strong> — Once at least one student has joined a group, a <em>Start ▶</em> button appears on that group's card. You can start each group independently as students arrive.</p>
+        <p style="margin-bottom:10px"><strong>What students see</strong> — Each student gets a vocab word with its definition. They read the "Story So Far" section, then write one sentence continuing the story using their word correctly. They have 2 minutes per turn (timer can be turned off in Menu).</p>
+        <p style="margin-bottom:10px"><strong>Voting</strong> — After all students in a group write, each student votes on whether their teammates used their words correctly. They can vote Yes, No, or Not Sure (abstain).</p>
+        <p style="margin-bottom:10px"><strong>Review Submissions</strong> — When voting is complete, a <em>Review Submissions →</em> button appears on that group's card (highlighted in bold). Click it to open the review panel.</p>
+        <p style="margin-bottom:10px"><strong>Ending a game early</strong> — Use the red <em>End Game ■</em> button on any group card to force-end that group's game immediately.</p>
+        <p><strong>Presenting stories</strong> — When all groups are done, a <em>Present Stories to Class</em> button appears. This opens a full-screen presentation view where you can walk through each group's completed story.</p>
+      </div>
+    </div>
+
+    <!-- REVIEWING -->
+    <div id="reviewing" class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:12px">👀 Reviewing Submissions</div>
+      <div style="font-size:1rem;line-height:1.9;color:var(--text)">
+        <p style="margin-bottom:10px">When a group finishes voting, their card on the <strong>Admin Dashboard</strong> shows <strong>⚠ Needs Review</strong>. Click <em>Review Submissions →</em> to open the review panel for that group.</p>
+        <p style="margin-bottom:10px">For each student you will see:
+          <br>• Their vocab word and its definition
+          <br>• Their sentence (with the word highlighted if used)
+          <br>• How the group voted
+          <br>• Two buttons: <strong>✓ Correct</strong> or <strong>✗ Incorrect</strong> — pre-selected to match the group vote
+        </p>
+        <p style="margin-bottom:10px"><strong>To override the group vote</strong> — simply click the opposite button before submitting. The system will note it as a Admin override.</p>
+        <p style="margin-bottom:10px">If a student did not use their word in their sentence, it is automatically marked incorrect — no decision needed.</p>
+        <p>Click <em>Submit Verdicts →</em> when done. Scores are calculated immediately and students see their results.</p>
+      </div>
+    </div>
+
+    <!-- SCORING -->
+    <div id="scoring" class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:12px">⭐ Scoring</div>
+      <div style="font-size:1rem;line-height:1.9;color:var(--text)">
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+          <div style="padding:8px 14px;background:var(--surface);display:flex;justify-content:space-between;border-left:3px solid var(--accent)">
+            <span>Student uses their word correctly (Admin confirms)</span>
+            <strong style="color:var(--accent);white-space:nowrap;margin-left:16px">+1</strong>
+          </div>
+          <div style="padding:8px 14px;background:var(--surface);display:flex;justify-content:space-between;border-left:3px solid var(--accent)">
+            <span>Student's vote matches Admin verdict</span>
+            <strong style="color:var(--accent);white-space:nowrap;margin-left:16px">+1</strong>
+          </div>
+          <div style="padding:8px 14px;background:var(--surface);display:flex;justify-content:space-between;border-left:3px solid var(--red)">
+            <span>Student's vote does not match Admin verdict</span>
+            <strong style="color:var(--red);white-space:nowrap;margin-left:16px">−1</strong>
+          </div>
+          <div style="padding:8px 14px;background:var(--surface);display:flex;justify-content:space-between;border-left:3px solid var(--muted)">
+            <span>Student abstains (Not sure)</span>
+            <strong style="color:var(--text2);white-space:nowrap;margin-left:16px">0</strong>
+          </div>
+        </div>
+        <p style="font-size:.9rem;color:var(--text2)">The Team Score is the sum of all individual points. Maximum team points per turn = number of players (one point per correct word). Scores accumulate across all turns.</p>
+      </div>
+    </div>
+
+    <!-- TROUBLESHOOTING -->
+    <div id="troubleshooting" class="card" style="margin-bottom:28px">
+      <div class="label" style="margin-bottom:12px">🔧 Troubleshooting</div>
+      <div style="display:flex;flex-direction:column;gap:16px;font-size:1rem;line-height:1.7;color:var(--text)">
+
+        <div style="padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="font-weight:700;margin-bottom:4px">First player's game doesn't start when I hit Start ▶</div>
+          <div style="color:var(--text2)">This can happen if the first player's screen hasn't polled yet. Wait 3–4 seconds — the game updates every 2 seconds automatically. If it still doesn't start, have the student refresh their page.</div>
+        </div>
+
+        <div style="padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="font-weight:700;margin-bottom:4px">A student joined with the wrong code or wrong name</div>
+          <div style="color:var(--text2)">As long as the game hasn't started, the student can use the <em>Wrong group? Leave →</em> button on the lobby screen and rejoin with the correct code. Once the game has started, end that group and restart it.</div>
+        </div>
+
+        <div style="padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="font-weight:700;margin-bottom:4px">Review Submissions button isn't appearing</div>
+          <div style="color:var(--text2)">The button only appears after all players in the group have voted. Check the group card — players who haven't voted yet show a 🗳 icon. The dashboard refreshes every 2–3 seconds.</div>
+        </div>
+
+        <div style="padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="font-weight:700;margin-bottom:4px">Old groups from previous sessions are showing on the dashboard</div>
+          <div style="color:var(--text2)">Go to Educator/Admin Setup and use the <em>Close Session</em> button in the Current Session panel to clear old data before starting a new one.</div>
+        </div>
+
+        <div style="padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="font-weight:700;margin-bottom:4px">Saved sessions or reports aren't showing up</div>
+          <div style="color:var(--text2)">Make sure you're on the same browser and device where you entered your license key. Data is saved to your license key — if you clear browser data or use a different browser, you will need to re-enter your key.</div>
+        </div>
+
+        <div style="padding-bottom:16px;border-bottom:1px solid var(--border)">
+          <div style="font-weight:700;margin-bottom:4px">A student's screen is stuck or not updating</div>
+          <div style="color:var(--text2)">Have the student refresh their browser. They can re-enter their name and code — if the game is still in progress they will rejoin. Their previous submission is saved.</div>
+        </div>
+
+        <div>
+          <div style="font-weight:700;margin-bottom:4px">The timer is too short for my students</div>
+          <div style="color:var(--text2)">Turn the timer off entirely in <em>Menu → Writing Timer</em>. Students will see ∞ instead of a countdown and can take as long as needed.</div>
+        </div>
+
+      </div>
+    </div>
+
     <div class="btn-row">
       <button class="btn btn-ghost btn-md" onclick="showView('v-landing')">← Back</button>
     </div>
@@ -931,10 +1056,28 @@ async function callAI(prompt, maxTokens = 200) {
 }
 
 // ══════════════════════════════════════════════
-//  TRANSLATIONS
+//  PROFANITY FILTER
+// ══════════════════════════════════════════════
+const BANNED_WORDS = [
+  'fuck','fucking','fucked','fucker','shit','shitting','shitty','bitch','bitches',
+  'ass','asshole','bastard','damn','crap','cunt','dick','cock','pussy','piss',
+  'whore','slut','nigger','nigga','faggot','fag','retard','dyke','chink','spic',
+  'wetback','kike','tranny','rape','rapist','molest','pedophile','kill yourself',
+  'kys','suicide','hang yourself','shoot yourself','go die','hate you','i hate',
+  'sex','sexy','porn','naked','boobs','tits','penis','vagina','masturbate','horny'
+];
+
+function containsProfanity(txt) {
+  const lower = txt.toLowerCase().replace(/[^a-z\s]/g, ' ');
+  const words = lower.split(/\s+/);
+  return BANNED_WORDS.find(banned => {
+    if (banned.includes(' ')) return lower.includes(banned);
+    return words.includes(banned);
+  }) || null;
+}
 // ══════════════════════════════════════════════
 const TRANSLATIONS = {
-  en: { tagline:'Vocab storytelling group game', create_session:'Create Session', join_game:'Join Game', settings_title:'Settings', appearance:'Appearance', dark_mode:'Dark mode', teacher_options:'Teacher Options', test_mode:'Test mode', clear_license:'Clear License Key', language:'Language', vote_title:'Did they use their word correctly?' },
+  en: { tagline:'Vocab storytelling group game', create_session:'Create Session', join_game:'Join Game', settings_title:'Settings', appearance:'Appearance', dark_mode:'Dark mode', teacher_options:'Educator/Admin Options', test_mode:'Test mode', clear_license:'Clear License Key', language:'Language', vote_title:'Did they use their word correctly?' },
   es: { tagline:'Juego grupal de vocabulario narrativo', create_session:'Crear Sesión', join_game:'Unirse al Juego', settings_title:'Configuración', appearance:'Apariencia', dark_mode:'Modo oscuro', teacher_options:'Opciones del Maestro', test_mode:'Modo de prueba', clear_license:'Borrar Licencia', language:'Idioma', vote_title:'¿Usaron su palabra correctamente?' },
   fr: { tagline:'Jeu de groupe avec vocabulaire narratif', create_session:'Créer une Session', join_game:'Rejoindre le Jeu', settings_title:'Paramètres', appearance:'Apparence', dark_mode:'Mode sombre', teacher_options:"Options de l'Enseignant", test_mode:'Mode test', clear_license:'Effacer la Licence', language:'Langue', vote_title:'Ont-ils utilisé leur mot correctement ?' }
 };
@@ -1230,7 +1373,7 @@ async function submitTeacherReview() {
     const definitiveVotes = rawVotes.filter(v => v !== null);
     const groupSaysCorrect = definitiveVotes.length > 0 ? definitiveVotes.filter(Boolean).length > definitiveVotes.length / 2 : false;
     const overruled = correct !== groupSaysCorrect && definitiveVotes.length > 0;
-    verdicts.push({ playerName: c.playerName, correct, reason: overruled ? 'Teacher overruled group vote.' : 'Confirmed by teacher.', word: c.word.word, groupSaysCorrect });
+    verdicts.push({ playerName: c.playerName, correct, reason: overruled ? 'Admin overruled group vote.' : 'Confirmed by Admin.', word: c.word.word, groupSaysCorrect });
   }
   // 1 point per correct word + vote accuracy bonus/penalty
   g.teamScore = g.teamScore || 0;
@@ -1466,7 +1609,7 @@ async function studentPoll() {
     }
     if (phase === 'teacher_review' && curView !== 'v-wait') {
       document.getElementById('wait-code').textContent = me.groupCode;
-      document.getElementById('wait-msg').textContent = 'Waiting for your teacher to review submissions…';
+      document.getElementById('wait-msg').textContent = 'Waiting for your Educator/Admin to review submissions…';
       showView('v-wait');
     }
     if (phase === 'round_results' && curView !== 'v-round-results') showRoundResults(g);
@@ -1517,6 +1660,16 @@ function onWriteInput() {
   const txt = document.getElementById('write-text').value;
   const hint = document.getElementById('write-hint');
   const word = me._currentWord?.word?.toLowerCase() || '';
+  const flagged = containsProfanity(txt);
+  if (flagged) {
+    hint.textContent = '⚠ Inappropriate language detected — please rewrite.';
+    hint.className = 'char-hint warn';
+    hint.style.color = 'var(--red)';
+    document.getElementById('write-submit-btn').disabled = true;
+    return;
+  }
+  document.getElementById('write-submit-btn').disabled = false;
+  hint.style.color = '';
   if (txt.length > 600) { hint.textContent = 'Getting long — wrap it up!'; hint.className = 'char-hint warn'; }
   else if (txt.toLowerCase().includes(word)) { hint.textContent = `✓ "${me._currentWord.word}" detected!`; hint.className = 'char-hint ok'; }
   else { hint.textContent = ''; hint.className = 'char-hint'; }
@@ -1525,6 +1678,13 @@ function onWriteInput() {
 async function submitWrite() {
   const txt = document.getElementById('write-text').value.trim();
   if (txt.length < 15) { toast('Write at least a sentence!', true); return; }
+  const flagged = containsProfanity(txt);
+  if (flagged) {
+    const hint = document.getElementById('write-hint');
+    if (hint) { hint.textContent = '⚠ Inappropriate language detected — please rewrite.'; hint.className = 'char-hint warn'; hint.style.color = 'var(--red)'; }
+    toast('Inappropriate language — please rewrite.', true);
+    return;
+  }
   const btn = document.getElementById('write-submit-btn');
   if (btn) { btn.disabled = true; btn.textContent = 'Checking…'; }
   const screen = await screenContent(txt);
@@ -1753,10 +1913,10 @@ async function submitLicense() {
     const res = await fetch('https://api.gumroad.com/v2/licenses/verify', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: `product_permalink=storydrop&license_key=${encodeURIComponent(key)}` });
     const data = await res.json();
     if (data.success || key.length >= 20) { localStorage.setItem('storydrop_license', key); showView('v-teacher-setup'); }
-    else { err.textContent = 'Invalid license key. Please check and try again.'; btn.disabled = false; btn.textContent = 'Unlock Teacher Mode →'; }
+    else { err.textContent = 'Invalid license key. Please check and try again.'; btn.disabled = false; btn.textContent = 'Unlock Educator/Admin Mode →'; }
   } catch {
     if (key.length >= 20) { localStorage.setItem('storydrop_license', key); showView('v-teacher-setup'); }
-    else { err.textContent = 'Could not verify key. Please try again.'; btn.disabled = false; btn.textContent = 'Unlock Teacher Mode →'; }
+    else { err.textContent = 'Could not verify key. Please try again.'; btn.disabled = false; btn.textContent = 'Unlock Educator/Admin Mode →'; }
   }
 }
 
