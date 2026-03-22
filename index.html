@@ -367,14 +367,25 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <span class="text-muted">groups (each gets its own code)</span>
     </div>
 
-    <div class="label">Story genre</div>
-    <div class="genre-row" id="genre-row-teacher">
-      <button class="genre-btn sel" data-g="horror">Horror</button>
-      <button class="genre-btn" data-g="romance">Romance</button>
-      <button class="genre-btn" data-g="sci-fi">Sci-Fi</button>
-      <button class="genre-btn" data-g="mystery">Mystery</button>
-      <button class="genre-btn" data-g="fantasy">Fantasy</button>
-      <button class="genre-btn" data-g="comedy">Comedy</button>
+    <div class="label">Story genre / subject</div>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+      <span style="font-size:1rem;color:var(--text2)">Genres</span>
+      <button class="toggle-switch on" id="genre-subject-toggle" onclick="toggleGenreSubject()" aria-label="Toggle genres/subjects"></button>
+      <span style="font-size:1rem;color:var(--text2)">Custom Subjects</span>
+    </div>
+    <div id="genre-section">
+      <div class="genre-row" id="genre-row-teacher">
+        <button class="genre-btn sel" data-g="horror">Horror</button>
+        <button class="genre-btn" data-g="romance">Romance</button>
+        <button class="genre-btn" data-g="sci-fi">Sci-Fi</button>
+        <button class="genre-btn" data-g="mystery">Mystery</button>
+        <button class="genre-btn" data-g="fantasy">Fantasy</button>
+        <button class="genre-btn" data-g="comedy">Comedy</button>
+      </div>
+    </div>
+    <div id="subject-section" style="display:none">
+      <div class="genre-row" id="subject-row"></div>
+      <div class="text-muted" id="no-subjects-msg" style="display:none;margin-bottom:16px">No custom subjects yet. Add them in <strong>Menu → Starter Sentences</strong>.</div>
     </div>
 
     <div class="label">Vocabulary words</div>
@@ -683,23 +694,54 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="hdr-meta">Starter Sentences</div>
   </div>
   <div class="content" style="max-width:780px;width:100%">
-    <p class="text-muted" style="margin-bottom:20px;line-height:1.7">These are the opening sentences used to start each group's story. You can add your own or delete any sentence. Select a genre to view and edit its sentences.</p>
-    <div class="genre-row" id="ss-genre-row">
-      <button class="genre-btn sel" data-g="horror" onclick="selectSSGenre('horror')">Horror</button>
-      <button class="genre-btn" data-g="romance" onclick="selectSSGenre('romance')">Romance</button>
-      <button class="genre-btn" data-g="sci-fi" onclick="selectSSGenre('sci-fi')">Sci-Fi</button>
-      <button class="genre-btn" data-g="mystery" onclick="selectSSGenre('mystery')">Mystery</button>
-      <button class="genre-btn" data-g="fantasy" onclick="selectSSGenre('fantasy')">Fantasy</button>
-      <button class="genre-btn" data-g="comedy" onclick="selectSSGenre('comedy')">Comedy</button>
+
+    <!-- SECTION TOGGLE -->
+    <div style="display:flex;gap:0;margin-bottom:24px;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;width:fit-content">
+      <button id="ss-tab-genres" onclick="switchSSTab('genres')" style="padding:9px 22px;font-family:'Courier Prime',monospace;font-size:1rem;letter-spacing:.08em;border:none;cursor:pointer;background:var(--text);color:var(--bg)">Genres</button>
+      <button id="ss-tab-subjects" onclick="switchSSTab('subjects')" style="padding:9px 22px;font-family:'Courier Prime',monospace;font-size:1rem;letter-spacing:.08em;border:none;cursor:pointer;background:transparent;color:var(--text2)">Custom Subjects</button>
     </div>
-    <div id="ss-list" style="margin-bottom:20px"></div>
-    <div class="card" style="margin-bottom:16px">
-      <div class="label" style="margin-bottom:10px">Add New Sentence</div>
-      <textarea id="ss-new-input" rows="3" placeholder="Type your new starter sentence here…"></textarea>
-      <div class="btn-row" style="margin-top:12px">
-        <button class="btn btn-primary btn-md" onclick="addStarterSentence()">Add &#x2192;</button>
+
+    <!-- GENRES TAB -->
+    <div id="ss-genres-tab">
+      <p class="text-muted" style="margin-bottom:16px;line-height:1.7">Edit the opening sentences for each default genre. These are used when a teacher picks a genre on the setup page.</p>
+      <div class="genre-row" id="ss-genre-row">
+        <button class="genre-btn sel" data-g="horror" onclick="selectSSGenre('horror')">Horror</button>
+        <button class="genre-btn" data-g="romance" onclick="selectSSGenre('romance')">Romance</button>
+        <button class="genre-btn" data-g="sci-fi" onclick="selectSSGenre('sci-fi')">Sci-Fi</button>
+        <button class="genre-btn" data-g="mystery" onclick="selectSSGenre('mystery')">Mystery</button>
+        <button class="genre-btn" data-g="fantasy" onclick="selectSSGenre('fantasy')">Fantasy</button>
+        <button class="genre-btn" data-g="comedy" onclick="selectSSGenre('comedy')">Comedy</button>
+      </div>
+      <div id="ss-list" style="margin-bottom:20px"></div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="label" style="margin-bottom:10px">Add New Sentence</div>
+        <textarea id="ss-new-input" rows="3" placeholder="Type your new starter sentence here…"></textarea>
+        <div class="btn-row" style="margin-top:12px">
+          <button class="btn btn-primary btn-md" onclick="addStarterSentence()">Add &#x2192;</button>
+        </div>
       </div>
     </div>
+
+    <!-- CUSTOM SUBJECTS TAB -->
+    <div id="ss-subjects-tab" style="display:none">
+      <p class="text-muted" style="margin-bottom:16px;line-height:1.7">Create your own subjects with custom starter sentences. These appear on the setup page when "Custom Subjects" is selected.</p>
+      <div id="ss-subject-list" style="margin-bottom:20px"></div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="label" style="margin-bottom:10px">Add New Subject</div>
+        <div class="field">
+          <div class="field-label">Subject Name</div>
+          <input type="text" id="ss-subject-name-input" placeholder="e.g. Greek Mythology" maxlength="40">
+        </div>
+        <div class="field">
+          <div class="field-label">Starter Sentence</div>
+          <textarea id="ss-subject-sentence-input" rows="3" placeholder="Opening sentence for this subject…"></textarea>
+        </div>
+        <div class="btn-row" style="margin-top:4px">
+          <button class="btn btn-primary btn-md" onclick="addCustomSubject()">Add Subject &#x2192;</button>
+        </div>
+      </div>
+    </div>
+
     <div class="btn-row">
       <button class="btn btn-ghost btn-md" onclick="showView('v-teacher-setup')">&#x2190; Back</button>
     </div>
@@ -826,15 +868,15 @@ async function sget(key) {
       `${SUPABASE_URL}/rest/v1/store?key=eq.${encodeURIComponent(key)}&select=value`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
     );
-    if (!res.ok) return null;
+    if (!res.ok) { console.error('sget failed:', res.status, await res.text()); return null; }
     const rows = await res.json();
     return rows.length ? rows[0].value : null;
-  } catch { return null; }
+  } catch(e) { console.error('sget error:', e); return null; }
 }
 
 async function sset(key, val) {
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/store`, {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/store`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
@@ -844,8 +886,13 @@ async function sset(key, val) {
       },
       body: JSON.stringify({ key, value: val, updated_at: new Date().toISOString() })
     });
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('sset failed:', res.status, err);
+      return false;
+    }
     return true;
-  } catch { return false; }
+  } catch(e) { console.error('sset error:', e); return false; }
 }
 
 async function sdel(key) {
@@ -997,7 +1044,6 @@ document.querySelectorAll('#genre-row-teacher .genre-btn').forEach(btn => {
     selectedGenre = btn.dataset.g;
   });
 });
-
 document.getElementById('join-code').addEventListener('input', function() { this.value = this.value.toUpperCase(); });
 
 function genCode() {
@@ -1832,16 +1878,62 @@ async function exportCSV() {
 }
 
 // ══════════════════════════════════════════════
+//  GENRE / SUBJECT TOGGLE (SETUP PAGE)
+// ══════════════════════════════════════════════
+let useCustomSubjects = false;
+
+function toggleGenreSubject() {
+  useCustomSubjects = !useCustomSubjects;
+  const toggle = document.getElementById('genre-subject-toggle');
+  if (toggle) toggle.className = 'toggle-switch' + (useCustomSubjects ? ' on' : '');
+  document.getElementById('genre-section').style.display = useCustomSubjects ? 'none' : 'block';
+  document.getElementById('subject-section').style.display = useCustomSubjects ? 'block' : 'none';
+  if (useCustomSubjects) loadSubjectRow();
+}
+
+async function loadSubjectRow() {
+  const licenseKey = localStorage.getItem('storydrop_license');
+  const saved = await sget(`sd_starters_${licenseKey}`);
+  const subjects = (saved && saved._customSubjects) || [];
+  const row = document.getElementById('subject-row');
+  const noMsg = document.getElementById('no-subjects-msg');
+  if (!subjects.length) { row.innerHTML = ''; noMsg.style.display = 'block'; selectedGenre = ''; return; }
+  noMsg.style.display = 'none';
+  row.innerHTML = subjects.map((s, i) => `<button class="genre-btn ${i===0?'sel':''}" data-g="custom_${s.name}" onclick="selectSubjectBtn(this,'custom_${s.name}')">${s.name}</button>`).join('');
+  if (subjects.length > 0) selectedGenre = `custom_${subjects[0].name}`;
+}
+
+function selectSubjectBtn(el, genre) {
+  document.querySelectorAll('#subject-row .genre-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedGenre = genre;
+}
+
+// ══════════════════════════════════════════════
 //  STARTER SENTENCES
 // ══════════════════════════════════════════════
 let ssCurrentGenre = 'horror';
 let ssCustomSentences = {};
+let ssCurrentTab = 'genres';
 
 async function loadStarterSentences() {
   const licenseKey = localStorage.getItem('storydrop_license');
-  const saved = await sget(`sd_starters_${licenseKey}`);
+  const key = `sd_starters_${licenseKey}`;
+  const saved = await sget(key);
+  console.log('Loading starter sentences with key:', key, '| Result:', saved);
   ssCustomSentences = saved || {};
   renderSSList();
+  renderSubjectList();
+}
+
+function switchSSTab(tab) {
+  ssCurrentTab = tab;
+  document.getElementById('ss-genres-tab').style.display = tab === 'genres' ? 'block' : 'none';
+  document.getElementById('ss-subjects-tab').style.display = tab === 'subjects' ? 'block' : 'none';
+  document.getElementById('ss-tab-genres').style.background = tab === 'genres' ? 'var(--text)' : 'transparent';
+  document.getElementById('ss-tab-genres').style.color = tab === 'genres' ? 'var(--bg)' : 'var(--text2)';
+  document.getElementById('ss-tab-subjects').style.background = tab === 'subjects' ? 'var(--text)' : 'transparent';
+  document.getElementById('ss-tab-subjects').style.color = tab === 'subjects' ? 'var(--bg)' : 'var(--text2)';
 }
 
 function selectSSGenre(genre) {
@@ -1851,20 +1943,42 @@ function selectSSGenre(genre) {
 }
 
 function renderSSList() {
-  const defaults = GENRE_OPENERS[ssCurrentGenre] || [];
-  const customs = ssCustomSentences[ssCurrentGenre] || [];
-  const all = [
-    ...defaults.map((s, i) => ({ text: s, type: 'default', idx: i })),
-    ...customs.map((s, i) => ({ text: s, type: 'custom', idx: i }))
-  ];
+  const removedIdxs = new Set(ssCustomSentences[`${ssCurrentGenre}_defaults_removed`] || []);
+  const defaults = (GENRE_OPENERS[ssCurrentGenre] || []).map((s, i) => ({ text: s, type: 'default', idx: i })).filter(s => !removedIdxs.has(s.idx));
+  const customs = (ssCustomSentences[ssCurrentGenre] || []).map((s, i) => ({ text: s, type: 'custom', idx: i }));
+  const all = [...defaults, ...customs];
   const el = document.getElementById('ss-list');
-  if (!all.length) { el.innerHTML = '<div class="text-muted" style="padding:12px 0">No sentences yet.</div>'; return; }
+  if (!all.length) { el.innerHTML = '<div class="text-muted" style="padding:12px 0">No sentences for this genre yet.</div>'; return; }
   el.innerHTML = all.map(s => `
     <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
       <div style="flex:1;font-size:1rem;line-height:1.7;color:var(--text)">${s.text}
         <span style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-left:8px">${s.type === 'default' ? 'Default' : 'Custom'}</span>
       </div>
       <button onclick="deleteStarterSentence('${s.type}', ${s.idx})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1.2rem;flex-shrink:0;padding:4px 8px">✕</button>
+    </div>`).join('');
+}
+
+function renderSubjectList() {
+  const subjects = ssCustomSentences._customSubjects || [];
+  const el = document.getElementById('ss-subject-list');
+  if (!el) return;
+  if (!subjects.length) { el.innerHTML = '<div class="text-muted" style="padding:12px 0">No custom subjects yet.</div>'; return; }
+  el.innerHTML = subjects.map((s, i) => `
+    <div style="border:1px solid var(--border);padding:16px;margin-bottom:12px;border-radius:var(--radius-sm)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-family:'Courier Prime',monospace;font-size:1.2rem;color:var(--accent);letter-spacing:.06em">${s.name}</div>
+        <button onclick="deleteCustomSubject(${i})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem;padding:2px 8px">Delete Subject</button>
+      </div>
+      ${(s.sentences||[]).map((sent, si) => `
+        <div style="display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="flex:1;font-size:1rem;line-height:1.6;color:var(--text)">${sent}</div>
+          <button onclick="deleteSubjectSentence(${i},${si})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem;padding:2px 6px">✕</button>
+        </div>`).join('')}
+      ${!(s.sentences||[]).length ? '<div class="text-muted" style="font-size:.9rem;padding:6px 0">No sentences yet.</div>' : ''}
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <input type="text" id="ss-add-sent-${i}" placeholder="Add a starter sentence…" style="font-size:.9rem">
+        <button class="btn btn-secondary btn-sm" onclick="addSubjectSentence(${i})">Add</button>
+      </div>
     </div>`).join('');
 }
 
@@ -1882,11 +1996,6 @@ async function addStarterSentence() {
 async function deleteStarterSentence(type, idx) {
   if (!confirm('Delete this sentence?')) return;
   if (type === 'default') {
-    // Move defaults into custom list minus this one
-    const defaults = GENRE_OPENERS[ssCurrentGenre] || [];
-    const remaining = defaults.filter((_, i) => i !== idx);
-    if (!ssCustomSentences[ssCurrentGenre]) ssCustomSentences[ssCurrentGenre] = [];
-    // Mark this genre as having overridden defaults
     ssCustomSentences[`${ssCurrentGenre}_defaults_removed`] = ssCustomSentences[`${ssCurrentGenre}_defaults_removed`] || [];
     ssCustomSentences[`${ssCurrentGenre}_defaults_removed`].push(idx);
   } else {
@@ -1897,15 +2006,68 @@ async function deleteStarterSentence(type, idx) {
   toast('Sentence deleted');
 }
 
+async function addCustomSubject() {
+  const name = document.getElementById('ss-subject-name-input').value.trim();
+  const sentence = document.getElementById('ss-subject-sentence-input').value.trim();
+  if (!name) { toast('Enter a subject name', true); return; }
+  if (!ssCustomSentences._customSubjects) ssCustomSentences._customSubjects = [];
+  if (ssCustomSentences._customSubjects.find(s => s.name.toLowerCase() === name.toLowerCase())) { toast('Subject already exists', true); return; }
+  ssCustomSentences._customSubjects.push({ name, sentences: sentence ? [sentence] : [] });
+  await saveStarterSentences();
+  document.getElementById('ss-subject-name-input').value = '';
+  document.getElementById('ss-subject-sentence-input').value = '';
+  renderSubjectList();
+  toast(`Subject "${name}" added!`);
+}
+
+async function deleteCustomSubject(idx) {
+  if (!confirm('Delete this subject and all its sentences?')) return;
+  ssCustomSentences._customSubjects = (ssCustomSentences._customSubjects || []).filter((_, i) => i !== idx);
+  await saveStarterSentences();
+  renderSubjectList();
+  toast('Subject deleted');
+}
+
+async function addSubjectSentence(subjectIdx) {
+  const input = document.getElementById(`ss-add-sent-${subjectIdx}`);
+  const txt = input?.value.trim();
+  if (!txt) { toast('Enter a sentence first', true); return; }
+  if (!ssCustomSentences._customSubjects[subjectIdx].sentences) ssCustomSentences._customSubjects[subjectIdx].sentences = [];
+  ssCustomSentences._customSubjects[subjectIdx].sentences.push(txt);
+  await saveStarterSentences();
+  renderSubjectList();
+  toast('Sentence added!');
+}
+
+async function deleteSubjectSentence(subjectIdx, sentIdx) {
+  if (!confirm('Delete this sentence?')) return;
+  ssCustomSentences._customSubjects[subjectIdx].sentences = ssCustomSentences._customSubjects[subjectIdx].sentences.filter((_, i) => i !== sentIdx);
+  await saveStarterSentences();
+  renderSubjectList();
+  toast('Sentence deleted');
+}
+
 async function saveStarterSentences() {
   const licenseKey = localStorage.getItem('storydrop_license');
-  await sset(`sd_starters_${licenseKey}`, ssCustomSentences);
+  if (!licenseKey) { toast('No license key found', true); return false; }
+  const key = `sd_starters_${licenseKey}`;
+  const result = await sset(key, ssCustomSentences);
+  if (!result) { toast('Save failed — check connection', true); return false; }
+  return true;
 }
 
 async function getOpenerForGroup(genre) {
   const licenseKey = localStorage.getItem('storydrop_license');
   const saved = await sget(`sd_starters_${licenseKey}`);
   const customs = saved || {};
+  if (genre && genre.startsWith('custom_')) {
+    const subjectName = genre.replace('custom_', '');
+    const subjects = customs._customSubjects || [];
+    const subject = subjects.find(s => s.name === subjectName);
+    const sentences = (subject && subject.sentences) || [];
+    if (sentences.length) return sentences[Math.floor(Math.random() * sentences.length)];
+    return getOpener('horror');
+  }
   const removedIdxs = new Set(customs[`${genre}_defaults_removed`] || []);
   const defaults = (GENRE_OPENERS[genre] || []).filter((_, i) => !removedIdxs.has(i));
   const custom = customs[genre] || [];
