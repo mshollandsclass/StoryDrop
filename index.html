@@ -2411,21 +2411,24 @@ function renderAnalytics() {
   const sel = document.getElementById('analytics-session-select');
   const idx = sel ? sel.value : 'all';
   const reports = idx === 'all' ? analyticsReports : [analyticsReports[parseInt(idx)]];
-  // Build word mastery data
+  // Build word mastery data — both charts use the same source
   const wordStats = {};
   const studentWordMap = {};
   reports.forEach(report => {
     (report.groups || []).forEach(g => {
-      (g.verdicts || []).forEach(v => {
-        if (!wordStats[v.word]) wordStats[v.word] = { correct: 0, total: 0 };
-        wordStats[v.word].total++;
-        if (v.correct) wordStats[v.word].correct++;
-      });
+      const verdicts = g.verdicts || [];
       (g.story || []).forEach(entry => {
-        if (entry.player === 'Narrator') return;
-        const verdict = (g.verdicts || []).find(v => v.playerName === entry.player);
+        if (entry.player === 'Narrator' || !entry.word) return;
+        // Find verdict matching both player AND word
+        const verdict = verdicts.find(v => v.playerName === entry.player && v.word === entry.word);
+        const correct = verdict ? verdict.correct : false;
+        // Mastery stats
+        if (!wordStats[entry.word]) wordStats[entry.word] = { correct: 0, total: 0 };
+        wordStats[entry.word].total++;
+        if (correct) wordStats[entry.word].correct++;
+        // Student gap map
         if (!studentWordMap[entry.player]) studentWordMap[entry.player] = {};
-        if (entry.word) studentWordMap[entry.player][entry.word] = verdict ? verdict.correct : false;
+        studentWordMap[entry.player][entry.word] = correct;
       });
     });
   });
