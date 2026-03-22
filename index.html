@@ -1813,6 +1813,9 @@ async function screenContent(txt) {
 async function doSubmitWrite(txt) {
   const g = await sget(`sd_group_${me.groupCode}`);
   if (!g) return;
+  // Guard against duplicate submissions
+  const alreadySubmitted = (g.roundContribs||[]).some(c => c.playerName === me.name && c.round === g.currentRound);
+  if (alreadySubmitted) { showView('v-wait'); return; }
   const wordObj = me._currentWord;
   const appearsInText = txt.toLowerCase().includes(wordObj.word.toLowerCase());
   const usedIdx = new Set(g.usedWordIndices||[]);
@@ -1820,7 +1823,8 @@ async function doSubmitWrite(txt) {
   g.roundContribs = g.roundContribs || [];
   g.roundContribs.push({ playerName: me.name, text: txt, word: wordObj, appearsInText, round: g.currentRound, idx: g.roundContribs.length });
   g.story = g.story || [];
-  g.story.push({ player: me.name, text: txt, word: appearsInText ? wordObj.word : null, round: g.currentRound });
+  const storyAlreadyAdded = g.story.some(s => s.player === me.name && s.round === g.currentRound);
+  if (!storyAlreadyAdded) g.story.push({ player: me.name, text: txt, word: appearsInText ? wordObj.word : null, round: g.currentRound });
   g.usedWordIndices = [...usedIdx];
   g.currentPlayerIdx = (g.currentPlayerIdx || 0) + 1;
   if (g.currentPlayerIdx >= g.players.length) {
