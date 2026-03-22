@@ -602,6 +602,22 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
   </div>
 </div>
 
+<!-- ══════════ TEACHER REVIEW MODAL ══════════ -->
+<div id="review-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9998;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:620px;width:100%;margin:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+      <div style="font-family:'Courier Prime',monospace;font-size:1.4rem;font-weight:700;color:var(--text)">Review Submissions</div>
+      <button onclick="document.getElementById('review-modal').style.display='none'" style="background:none;border:none;color:var(--text2);font-size:1.2rem;cursor:pointer">✕</button>
+    </div>
+    <div style="font-size:1rem;color:var(--text2);margin-bottom:20px" id="review-modal-group">Group —</div>
+    <div id="review-modal-list" style="margin-bottom:20px"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary btn-lg" onclick="submitTeacherReview()">Submit Verdicts &#x2192;</button>
+      <span class="text-muted" id="review-modal-status"></span>
+    </div>
+  </div>
+</div>
+
 <!-- ══════════ REPORTS MODAL ══════════ -->
 <div id="reports-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;align-items:center;justify-content:center;padding:20px">
   <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:24px;max-width:520px;width:100%;max-height:80vh;overflow-y:auto">
@@ -656,6 +672,36 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     </div>
     <div id="saved-sessions-list">
       <div class="text-muted" style="padding:20px 0">Loading saved sessions…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ STARTER SENTENCES ══════════ -->
+<div class="view" id="v-starter-sentences">
+  <div class="hdr" style="max-width:780px;width:100%">
+    <div class="logo">STORY<br><span>DROP</span></div>
+    <div class="hdr-meta">Starter Sentences</div>
+  </div>
+  <div class="content" style="max-width:780px;width:100%">
+    <p class="text-muted" style="margin-bottom:20px;line-height:1.7">These are the opening sentences used to start each group's story. You can add your own or delete any sentence. Select a genre to view and edit its sentences.</p>
+    <div class="genre-row" id="ss-genre-row">
+      <button class="genre-btn sel" data-g="horror" onclick="selectSSGenre('horror')">Horror</button>
+      <button class="genre-btn" data-g="romance" onclick="selectSSGenre('romance')">Romance</button>
+      <button class="genre-btn" data-g="sci-fi" onclick="selectSSGenre('sci-fi')">Sci-Fi</button>
+      <button class="genre-btn" data-g="mystery" onclick="selectSSGenre('mystery')">Mystery</button>
+      <button class="genre-btn" data-g="fantasy" onclick="selectSSGenre('fantasy')">Fantasy</button>
+      <button class="genre-btn" data-g="comedy" onclick="selectSSGenre('comedy')">Comedy</button>
+    </div>
+    <div id="ss-list" style="margin-bottom:20px"></div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="label" style="margin-bottom:10px">Add New Sentence</div>
+      <textarea id="ss-new-input" rows="3" placeholder="Type your new starter sentence here…"></textarea>
+      <div class="btn-row" style="margin-top:12px">
+        <button class="btn btn-primary btn-md" onclick="addStarterSentence()">Add &#x2192;</button>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost btn-md" onclick="showView('v-teacher-setup')">&#x2190; Back</button>
     </div>
   </div>
 </div>
@@ -741,6 +787,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div id="menu-teacher-section" style="display:none">
       <div style="height:1px;background:var(--border);margin:6px 0"></div>
       <div style="padding:6px 12px;font-size:1rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin-bottom:4px">Go to</div>
+      <button onclick="closeMenu();showView('v-starter-sentences')" class="menu-item">✏️ Starter Sentences</button>
       <button onclick="closeMenu();showView('v-account')" class="menu-item">👤 Account Info</button>
       <button onclick="closeMenu();showView('v-saved-sessions')" class="menu-item">📂 Saved Sessions</button>
       <button onclick="closeMenu();showReportsModal()" class="menu-item">📊 Past Reports</button>
@@ -887,7 +934,7 @@ let dashPollTimer = null;
 //  UI HELPERS
 // ══════════════════════════════════════════════
 function showView(id) {
-  const teacherOnlyViews = ['v-teacher-setup', 'v-teacher-dash', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
+  const teacherOnlyViews = ['v-teacher-setup', 'v-teacher-dash', 'v-present', 'v-account', 'v-saved-sessions', 'v-support', 'v-starter-sentences'];
   if (teacherOnlyViews.includes(id) && !isLicensed()) { showView('v-license'); return; }
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -896,6 +943,7 @@ function showView(id) {
   updateMenuForView(id);
   if (id === 'v-account') loadAccountInfo();
   if (id === 'v-saved-sessions') showSavedSessions();
+  if (id === 'v-starter-sentences') loadStarterSentences();
 }
 
 function toast(msg, isErr=false) {
@@ -1022,6 +1070,80 @@ async function saveSetupSession() {
 }
 
 // ══════════════════════════════════════════════
+//  TEACHER REVIEW
+// ══════════════════════════════════════════════
+let reviewGroupCode = null;
+
+async function openTeacherReview(code) {
+  const g = await sget(`sd_group_${code}`);
+  if (!g) return;
+  reviewGroupCode = code;
+  const needsCheck = (g.roundContribs||[]).filter(c => c.round === g.currentRound);
+  document.getElementById('review-modal-group').textContent = `Group ${code} — Turn ${g.currentRound}`;
+  document.getElementById('review-modal-status').textContent = '';
+  document.getElementById('review-modal-list').innerHTML = needsCheck.map((c, i) => {
+    const rawVotes = g.wordVotes?.[c.playerName] || [];
+    const definitiveVotes = rawVotes.filter(v => v !== null);
+    const groupSaysCorrect = definitiveVotes.length > 0 ? definitiveVotes.filter(Boolean).length > definitiveVotes.length / 2 : null;
+    const groupLabel = definitiveVotes.length === 0 ? 'No votes' : groupSaysCorrect ? 'Group voted: ✓ Correct' : 'Group voted: ✗ Incorrect';
+    const hl = c.appearsInText ? c.text.replace(new RegExp(`\\b${c.word.word}\\b`,'gi'), '<span class="story-hit">$&</span>') : c.text;
+    return `<div style="border:1px solid var(--border);padding:16px;margin-bottom:14px;border-radius:var(--radius-sm)">
+      <div style="font-family:'Courier Prime',monospace;font-size:1.1rem;color:var(--accent);margin-bottom:4px">${c.playerName}</div>
+      <div style="font-size:1rem;color:var(--text2);margin-bottom:8px">Word: <strong style="color:var(--text)">${c.word.word}</strong> — ${c.word.def}</div>
+      <div style="font-family:'DM Sans',sans-serif;font-size:1rem;line-height:1.7;color:var(--text);margin-bottom:10px;padding:10px;background:var(--surface);border-radius:var(--radius-sm)">${c.appearsInText ? hl : `<span style="color:var(--text2);font-style:italic">${c.text}</span><div style="color:var(--red);font-size:.85rem;margin-top:4px">Word not used</div>`}</div>
+      <div style="font-size:.85rem;color:var(--text2);margin-bottom:10px">${groupLabel}</div>
+      ${c.appearsInText ? `<div style="display:flex;gap:8px">
+        <label class="vote-yn" for="tr-yes-${i}"><input type="radio" id="tr-yes-${i}" name="tr-${i}" data-player="${c.playerName}" value="yes" ${groupSaysCorrect===true?'checked':''}><span>✓ Correct</span></label>
+        <label class="vote-yn" for="tr-no-${i}"><input type="radio" id="tr-no-${i}" name="tr-${i}" data-player="${c.playerName}" value="no" ${groupSaysCorrect===false?'checked':''}><span>✗ Incorrect</span></label>
+      </div>` : `<div style="color:var(--red);font-size:.9rem">Word not used — no points awarded.</div>`}
+    </div>`;
+  }).join('');
+  document.getElementById('review-modal').style.display = 'flex';
+}
+
+async function submitTeacherReview() {
+  const g = await sget(`sd_group_${reviewGroupCode}`);
+  if (!g) return;
+  const verdicts = [];
+  const needsCheck = (g.roundContribs||[]).filter(c => c.round === g.currentRound);
+  for (let i = 0; i < needsCheck.length; i++) {
+    const c = needsCheck[i];
+    if (!c.appearsInText) {
+      verdicts.push({ playerName: c.playerName, correct: false, reason: 'Word not used.', word: c.word.word });
+      continue;
+    }
+    const checked = document.querySelector(`input[name="tr-${i}"]:checked`);
+    if (!checked) { document.getElementById('review-modal-status').textContent = `Make a decision for ${c.playerName}`; return; }
+    const correct = checked.value === 'yes';
+    const rawVotes = g.wordVotes?.[c.playerName] || [];
+    const definitiveVotes = rawVotes.filter(v => v !== null);
+    const groupSaysCorrect = definitiveVotes.length > 0 ? definitiveVotes.filter(Boolean).length > definitiveVotes.length / 2 : false;
+    const overruled = correct !== groupSaysCorrect && definitiveVotes.length > 0;
+    verdicts.push({ playerName: c.playerName, correct, reason: overruled ? 'Teacher overruled group vote.' : 'Confirmed by teacher.', word: c.word.word, groupSaysCorrect });
+  }
+  // Calculate scores
+  g.teamScore = g.teamScore || 0;
+  verdicts.forEach(v => {
+    if (v.correct) { g.teamScore += 1; g.scores[v.playerName] = (g.scores[v.playerName]||0) + 1; }
+    const votes = g.wordVotes?.[v.playerName] || [];
+    votes.forEach(vote => {
+      if (vote === null) return;
+      if (vote === true && v.correct) g.teamScore += 1;
+      if (vote === true && !v.correct) g.teamScore -= 1;
+      if (vote === false && !v.correct) g.teamScore += 1;
+      if (vote === false && v.correct) g.teamScore -= 1;
+    });
+  });
+  g.results = g.results || {};
+  g.results.teamScore = g.teamScore;
+  g._roundVerdicts = verdicts;
+  g.phase = 'round_results';
+  await sset(`sd_group_${reviewGroupCode}`, g);
+  document.getElementById('review-modal').style.display = 'none';
+  toast(`Group ${reviewGroupCode} verdicts submitted`);
+}
+
+// ══════════════════════════════════════════════
 //  TEACHER: CREATE SESSION
 // ══════════════════════════════════════════════
 async function createSession() {
@@ -1092,8 +1214,9 @@ function renderDashGrid(codes, groups) {
   el.innerHTML = codes.map(code => {
     const g = groups[code];
     if (!g) return `<div class="group-card"><div class="gc-code">${code}</div><div class="gc-status">Waiting for players…</div></div>`;
+    const needsReview = g.status === 'playing' && g.phase === 'teacher_review';
     const cls = g.status === 'playing' ? 'live' : g.status === 'done' ? 'done' : '';
-    const statusLabel = g.status === 'playing' ? `Turn ${g.currentRound || 1}` : g.status === 'done' ? 'Done' : 'Waiting';
+    const statusLabel = needsReview ? '⚠ Needs Review' : g.status === 'playing' ? `Turn ${g.currentRound || 1}` : g.status === 'done' ? 'Done' : 'Waiting';
     const playerStatuses = (g.players || []).map(p => {
       let icon = '⏳', note = 'waiting';
       if (g.status === 'playing') {
@@ -1101,7 +1224,7 @@ function renderDashGrid(codes, groups) {
         const voted = g.votes && g.votes[p];
         if (g.phase === 'write') { icon = contributed ? '✓' : '✍'; note = contributed ? 'submitted' : 'writing…'; }
         else if (g.phase === 'vote') { icon = voted ? '✓' : '🗳'; note = voted ? 'voted' : 'voting…'; }
-        else if (g.phase === 'ai') { icon = '🤖'; note = 'AI judging'; }
+        else if (g.phase === 'teacher_review') { icon = '👀'; note = 'awaiting teacher'; }
         else if (g.phase === 'results') { icon = '📊'; note = 'viewing results'; }
       } else if (g.status === 'done') { icon = '🏁'; note = `${(g.scores||{})[p]||0} pts`; }
       return `<div style="font-size:1rem;line-height:1.8;color:var(--text)">${icon} <span style="color:var(--text2)">${p}</span> — ${note}</div>`;
@@ -1109,7 +1232,8 @@ function renderDashGrid(codes, groups) {
     const teamScoreDisplay = g.status === 'done' && g.results ? `<div style="font-family:'Courier Prime',monospace;font-size:1.3rem;color:var(--accent);margin-top:6px">${g.results.teamScore || 0} team pts</div>` : '';
     const startBtn = g.status === 'waiting' && (g.players||[]).length >= 1 ? `<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="startGroupGame('${code}')">Start ▶</button>` : '';
     const endBtn = g.status === 'playing' ? `<button class="btn btn-danger btn-sm" style="margin-top:10px" onclick="endGroupGame('${code}')">End Game ■</button>` : '';
-    return `<div class="group-card ${cls}"><div class="gc-code">${code}</div><div class="gc-status ${cls}">${statusLabel}</div><div class="gc-players">${playerStatuses}</div>${teamScoreDisplay}${startBtn}${endBtn}</div>`;
+    const reviewBtn = needsReview ? `<button class="btn btn-primary btn-sm" style="margin-top:10px;background:var(--accent);color:var(--bg)" onclick="openTeacherReview('${code}')">Review Submissions →</button>` : '';
+    return `<div class="group-card ${cls}" ${needsReview?'style="border-color:var(--accent);border-width:2px"':''}><div class="gc-code">${code}</div><div class="gc-status ${cls}">${statusLabel}</div><div class="gc-players">${playerStatuses}</div>${teamScoreDisplay}${startBtn}${reviewBtn}${endBtn}</div>`;
   }).join('');
   const anyDone = Object.values(groups).some(g => g.status === 'done');
   const btn = document.getElementById('present-btn');
@@ -1212,6 +1336,11 @@ async function studentPoll() {
       else if (myVoted && curView === 'v-vote') { showView('v-wait'); document.getElementById('wait-code').textContent = me.groupCode; document.getElementById('wait-msg').textContent = `${Object.keys(g.votes||{}).length} of ${g.players.length} players have voted…`; }
     }
     if (phase === 'ai' && curView !== 'v-ai') startAIPhase(g);
+    if (phase === 'teacher_review' && curView !== 'v-wait') {
+      document.getElementById('wait-code').textContent = me.groupCode;
+      document.getElementById('wait-msg').textContent = 'Waiting for your teacher to review submissions…';
+      showView('v-wait');
+    }
     if (phase === 'round_results' && curView !== 'v-round-results') showRoundResults(g);
   }
   if (g.status === 'done') { if (curView !== 'v-final') showFinal(g); }
@@ -1235,7 +1364,7 @@ function startWriteTurn(g) {
   document.getElementById('w-pos').textContent = wordObj.pos;
   document.getElementById('w-def').textContent = wordObj.def;
   document.getElementById('write-text').value = '';
-  document.getElementById('write-hint').textContent = 'Aim for 2–4 sentences. Use your word!';
+  document.getElementById('write-hint').textContent = '';
   document.getElementById('write-hint').className = 'char-hint';
   renderStory('write-story', g.story);
   showView('v-write');
@@ -1262,7 +1391,7 @@ function onWriteInput() {
   const word = me._currentWord?.word?.toLowerCase() || '';
   if (txt.length > 600) { hint.textContent = 'Getting long — wrap it up!'; hint.className = 'char-hint warn'; }
   else if (txt.toLowerCase().includes(word)) { hint.textContent = `✓ "${me._currentWord.word}" detected!`; hint.className = 'char-hint ok'; }
-  else { hint.textContent = `Use your word: "${me._currentWord?.word}"`; hint.className = 'char-hint'; }
+  else { hint.textContent = ''; hint.className = 'char-hint'; }
 }
 
 async function submitWrite() {
@@ -1305,7 +1434,7 @@ async function doSubmitWrite(txt) {
   g.currentPlayerIdx = (g.currentPlayerIdx || 0) + 1;
   if (g.currentPlayerIdx >= g.players.length) {
     g.currentPlayerIdx = 0; g.votes = {}; g.wordVotes = {};
-    g.phase = g.players.length === 1 ? 'ai' : 'vote';
+    g.phase = g.players.length === 1 ? 'teacher_review' : 'vote';
   }
   await sset(`sd_group_${me.groupCode}`, g);
   document.getElementById('wait-code').textContent = me.groupCode;
@@ -1319,7 +1448,7 @@ async function doSubmitWrite(txt) {
 async function startVoteTurn(g) {
   myVote = 'done'; myWordVotes = {};
   const others = (g.roundContribs||[]).filter(c => c.playerName !== me.name && (c.round === g.currentRound || c.round == null));
-  if (others.length === 0) { g.votes = g.votes || {}; g.votes[me.name] = 'done'; g.phase = 'ai'; sset(`sd_group_${me.groupCode}`, g); showView('v-wait'); return; }
+  if (others.length === 0) { g.votes = g.votes || {}; g.votes[me.name] = 'done'; g.phase = 'teacher_review'; sset(`sd_group_${me.groupCode}`, g); showView('v-wait'); return; }
   document.getElementById('vote-round').textContent = g.currentRound;
   document.getElementById('vote-list').innerHTML = others.map((c,i) => {
     const hl = c.appearsInText ? c.text.replace(new RegExp(`\\b${c.word.word}\\b`,'gi'), '<span class="story-hit">$&</span>') : c.text;
@@ -1342,7 +1471,7 @@ async function submitVote() {
   g.wordVotes = g.wordVotes || {};
   Object.entries(wvotes).forEach(([player, correct]) => { if (!g.wordVotes[player]) g.wordVotes[player] = []; if (correct !== null) g.wordVotes[player].push(correct); });
   await sset(`sd_group_${me.groupCode}`, g);
-  if (g.players.every(p => g.votes[p])) { g.phase = 'ai'; await sset(`sd_group_${me.groupCode}`, g); }
+  if (g.players.every(p => g.votes[p])) { g.phase = 'teacher_review'; await sset(`sd_group_${me.groupCode}`, g); }
   showView('v-wait');
 }
 
@@ -1453,7 +1582,7 @@ async function endGroupGame(code) {
 async function startGroupGame(code) {
   const g = await sget(`sd_group_${code}`);
   if (!g || g.players.length < 1) { toast('Need at least 1 player to start', true); return; }
-  const opener = getOpener(g.genre);
+  const opener = await getOpenerForGroup(g.genre);
   g.status = 'playing'; g.phase = 'write';
   g.story = [{ player: 'Narrator', text: opener, word: null }];
   g.currentPlayerIdx = 0; g.currentRound = 1;
@@ -1602,7 +1731,7 @@ async function leaveGroup() {
 //  SETTINGS
 // ══════════════════════════════════════════════
 let settingsOpen = false;
-const TEACHER_VIEWS = ['v-teacher-dash', 'v-teacher-setup', 'v-present', 'v-account', 'v-saved-sessions', 'v-support'];
+const TEACHER_VIEWS = ['v-teacher-dash', 'v-teacher-setup', 'v-present', 'v-account', 'v-saved-sessions', 'v-support', 'v-starter-sentences'];
 const GEAR_ONLY_VIEWS = ['v-landing', 'v-license', 'v-student-join', 'v-lobby', 'v-rules', 'v-write', 'v-wait', 'v-vote', 'v-ai', 'v-round-results', 'v-final', 'v-class-vote'];
 
 function updateMenuForView(viewId) {
@@ -1700,6 +1829,89 @@ async function exportCSV() {
   const a = document.createElement('a');
   a.href=url; a.download=`storydrop_results_${new Date().toISOString().slice(0,10)}.csv`; a.click();
   URL.revokeObjectURL(url); toast('Results exported!');
+}
+
+// ══════════════════════════════════════════════
+//  STARTER SENTENCES
+// ══════════════════════════════════════════════
+let ssCurrentGenre = 'horror';
+let ssCustomSentences = {};
+
+async function loadStarterSentences() {
+  const licenseKey = localStorage.getItem('storydrop_license');
+  const saved = await sget(`sd_starters_${licenseKey}`);
+  ssCustomSentences = saved || {};
+  renderSSList();
+}
+
+function selectSSGenre(genre) {
+  ssCurrentGenre = genre;
+  document.querySelectorAll('#ss-genre-row .genre-btn').forEach(b => b.classList.toggle('sel', b.dataset.g === genre));
+  renderSSList();
+}
+
+function renderSSList() {
+  const defaults = GENRE_OPENERS[ssCurrentGenre] || [];
+  const customs = ssCustomSentences[ssCurrentGenre] || [];
+  const all = [
+    ...defaults.map((s, i) => ({ text: s, type: 'default', idx: i })),
+    ...customs.map((s, i) => ({ text: s, type: 'custom', idx: i }))
+  ];
+  const el = document.getElementById('ss-list');
+  if (!all.length) { el.innerHTML = '<div class="text-muted" style="padding:12px 0">No sentences yet.</div>'; return; }
+  el.innerHTML = all.map(s => `
+    <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1;font-size:1rem;line-height:1.7;color:var(--text)">${s.text}
+        <span style="font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--text2);margin-left:8px">${s.type === 'default' ? 'Default' : 'Custom'}</span>
+      </div>
+      <button onclick="deleteStarterSentence('${s.type}', ${s.idx})" style="background:none;border:none;color:var(--red);cursor:pointer;font-size:1.2rem;flex-shrink:0;padding:4px 8px">✕</button>
+    </div>`).join('');
+}
+
+async function addStarterSentence() {
+  const txt = document.getElementById('ss-new-input').value.trim();
+  if (!txt) { toast('Enter a sentence first', true); return; }
+  if (!ssCustomSentences[ssCurrentGenre]) ssCustomSentences[ssCurrentGenre] = [];
+  ssCustomSentences[ssCurrentGenre].push(txt);
+  await saveStarterSentences();
+  document.getElementById('ss-new-input').value = '';
+  renderSSList();
+  toast('Sentence added!');
+}
+
+async function deleteStarterSentence(type, idx) {
+  if (!confirm('Delete this sentence?')) return;
+  if (type === 'default') {
+    // Move defaults into custom list minus this one
+    const defaults = GENRE_OPENERS[ssCurrentGenre] || [];
+    const remaining = defaults.filter((_, i) => i !== idx);
+    if (!ssCustomSentences[ssCurrentGenre]) ssCustomSentences[ssCurrentGenre] = [];
+    // Mark this genre as having overridden defaults
+    ssCustomSentences[`${ssCurrentGenre}_defaults_removed`] = ssCustomSentences[`${ssCurrentGenre}_defaults_removed`] || [];
+    ssCustomSentences[`${ssCurrentGenre}_defaults_removed`].push(idx);
+  } else {
+    ssCustomSentences[ssCurrentGenre] = (ssCustomSentences[ssCurrentGenre] || []).filter((_, i) => i !== idx);
+  }
+  await saveStarterSentences();
+  renderSSList();
+  toast('Sentence deleted');
+}
+
+async function saveStarterSentences() {
+  const licenseKey = localStorage.getItem('storydrop_license');
+  await sset(`sd_starters_${licenseKey}`, ssCustomSentences);
+}
+
+async function getOpenerForGroup(genre) {
+  const licenseKey = localStorage.getItem('storydrop_license');
+  const saved = await sget(`sd_starters_${licenseKey}`);
+  const customs = saved || {};
+  const removedIdxs = new Set(customs[`${genre}_defaults_removed`] || []);
+  const defaults = (GENRE_OPENERS[genre] || []).filter((_, i) => !removedIdxs.has(i));
+  const custom = customs[genre] || [];
+  const all = [...defaults, ...custom];
+  if (!all.length) return getOpener(genre);
+  return all[Math.floor(Math.random() * all.length)];
 }
 
 // ══════════════════════════════════════════════
