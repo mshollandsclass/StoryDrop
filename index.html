@@ -497,16 +497,16 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
       <div class="timer" id="write-timer">2:00</div>
       <div class="round-pill" id="write-round">Round 1</div>
     </div>
-    <div class="label">Story so far</div>
-    <div class="story-scroll" id="write-story"><div class="story-empty">The story begins with you…</div></div>
     <div class="word-card">
       <div class="word-big" id="w-word">—</div>
       <div class="word-pos" id="w-pos">—</div>
       <div class="word-def" id="w-def">—</div>
     </div>
+    <div class="label">Story so far</div>
+    <div class="story-scroll" id="write-story"><div class="story-empty">The story begins with you…</div></div>
     <div class="field">
       <textarea id="write-text" rows="4" placeholder="Continue the story here… use your word naturally." oninput="onWriteInput()"></textarea>
-      <div class="char-hint" id="write-hint">Aim for 2–4 sentences. Use your word!</div>
+      <div class="char-hint" id="write-hint"></div>
     </div>
     <div class="btn-row">
       <button class="btn btn-primary btn-lg" id="write-submit-btn" onclick="submitWrite()">Submit &#x2192;</button>
@@ -556,7 +556,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     <div class="hdr-meta">AI is judging…</div>
   </div>
   <div class="content">
-    <div class="ai-badge">⚡ Claude is reviewing word usage</div>
+    <div class="ai-badge">⚡ AI is reviewing word usage</div>
     <p class="text-muted" style="margin-bottom:20px;line-height:1.7">The group voted on word usage. AI now checks each one and overrules if the group got it wrong.</p>
     <div class="verdict-list" id="verdict-list"></div>
     <div id="ai-loading" style="font-size:.78rem;color:var(--text2);font-style:italic;margin-bottom:16px">Analyzing…</div>
@@ -687,7 +687,7 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
   <div class="content" style="max-width:680px;width:100%">
     <div class="card" style="margin-bottom:16px">
       <div class="label" style="margin-bottom:10px">🎯 The Goal</div>
-      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">Your team builds a story together — one sentence at a time. Use your vocab word correctly and help your team earn as many points as possible.</p>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">Your team builds a story together — one sentence at a time. Read the "Story so far" section and use your vocab word correctly and help your team earn as many points as possible.</p>
     </div>
     <div class="card" style="margin-bottom:16px">
       <div class="label" style="margin-bottom:10px">✍ Writing Your Sentence</div>
@@ -695,11 +695,11 @@ hr{border:none;border-top:1px solid var(--border);margin:22px 0}
     </div>
     <div class="card" style="margin-bottom:16px">
       <div class="label" style="margin-bottom:10px">🗳 Voting</div>
-      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">After everyone writes, you vote on whether each teammate used their word correctly.</p>
+      <p style="font-size:.88rem;line-height:1.8;color:var(--text)">After everyone writes their sentence(s), vote on whether each teammate used their word correctly.</p>
       <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px">
         <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--accent)"><strong style="color:var(--accent)">Yes</strong> — you think they used it correctly</div>
         <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--red)"><strong style="color:var(--red)">No</strong> — you think they used it incorrectly</div>
-        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--muted)"><strong style="color:var(--text2)">Not sure</strong> — you abstain and earn nothing</div>
+        <div style="font-size:.83rem;padding:8px 12px;background:var(--surface);border-left:3px solid var(--muted)"><strong style="color:var(--text2)">Not sure</strong> — you abstain and earn nothing. The game will ultimately decide if the word and votes are correct.</div>
       </div>
     </div>
     <div class="card" style="margin-bottom:16px">
