@@ -203,8 +203,8 @@ textarea{resize:none;font-family:'DM Sans',sans-serif;font-size:1rem;line-height
 .score-bar{height:3px;background:var(--bg)}.score-bar-fill{height:100%;background:var(--accent);transition:width 1s ease}
 
 /* ── TEACHER DASHBOARD ── */
-.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:24px}
-.group-card{background:var(--card);border:1px solid var(--border);padding:18px 20px;transition:border-color .2s}
+.dash-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:24px}
+.group-card{background:var(--card);border:1px solid var(--border);padding:20px 22px;transition:border-color .2s;display:flex;flex-direction:column;justify-content:space-between;min-height:160px}
 .group-card.live{border-color:var(--accent)}
 .group-card.done{border-color:var(--border-hi)}
 .gc-code{font-family:'Courier Prime',monospace;font-size:1.6rem;color:var(--accent);letter-spacing:.15em;margin-bottom:4px}
@@ -1230,10 +1230,10 @@ function renderDashGrid(codes, groups) {
       return `<div style="font-size:1rem;line-height:1.8;color:var(--text)">${icon} <span style="color:var(--text2)">${p}</span> — ${note}</div>`;
     }).join('');
     const teamScoreDisplay = g.status === 'done' && g.results ? `<div style="font-family:'Courier Prime',monospace;font-size:1.3rem;color:var(--accent);margin-top:6px">${g.results.teamScore || 0} team pts</div>` : '';
-    const startBtn = g.status === 'waiting' && (g.players||[]).length >= 1 ? `<button class="btn btn-primary btn-sm" style="margin-top:10px" onclick="startGroupGame('${code}')">Start ▶</button>` : '';
-    const endBtn = g.status === 'playing' ? `<button class="btn btn-danger btn-sm" style="margin-top:10px" onclick="endGroupGame('${code}')">End Game ■</button>` : '';
-    const reviewBtn = needsReview ? `<button class="btn btn-primary btn-sm" style="margin-top:10px;background:var(--accent);color:var(--bg)" onclick="openTeacherReview('${code}')">Review Submissions →</button>` : '';
-    return `<div class="group-card ${cls}" ${needsReview?'style="border-color:var(--accent);border-width:2px"':''}><div class="gc-code">${code}</div><div class="gc-status ${cls}">${statusLabel}</div><div class="gc-players">${playerStatuses}</div>${teamScoreDisplay}${startBtn}${reviewBtn}${endBtn}</div>`;
+    const startBtn = g.status === 'waiting' && (g.players||[]).length >= 1 ? `<button class="btn btn-primary btn-sm" onclick="startGroupGame('${code}')">Start ▶</button>` : '';
+    const endBtn = g.status === 'playing' ? `<button class="btn btn-danger btn-sm" style="color:#ffffff" onclick="endGroupGame('${code}')">End Game ■</button>` : '';
+    const reviewBtn = needsReview ? `<button class="btn btn-primary btn-sm" onclick="openTeacherReview('${code}')">Review Submissions →</button>` : '';
+    return `<div class="group-card ${cls}" ${needsReview?'style="border-color:var(--accent);border-width:2px"':''}><div><div class="gc-code">${code}</div><div class="gc-status ${cls}">${statusLabel}</div><div class="gc-players">${playerStatuses}</div>${teamScoreDisplay}</div><div style="display:flex;flex-direction:column;gap:6px;padding-top:10px">${startBtn}${reviewBtn}${endBtn}</div></div>`;
   }).join('');
   const anyDone = Object.values(groups).some(g => g.status === 'done');
   const btn = document.getElementById('present-btn');
