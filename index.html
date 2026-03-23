@@ -1795,18 +1795,10 @@ async function submitWrite() {
     return;
   }
   const btn = document.getElementById('write-submit-btn');
-  if (btn) { btn.disabled = true; btn.textContent = 'Checking…'; }
-  const screen = await screenContent(txt);
-  if (!screen.ok) {
-    if (btn) { btn.disabled = false; btn.textContent = 'Submit →'; }
-    const hint = document.getElementById('write-hint');
-    if (hint) { hint.textContent = '⚠ ' + (screen.reason || 'Inappropriate content — please rewrite.'); hint.className = 'char-hint warn'; hint.style.color = 'var(--red)'; }
-    await sset(`sd_flag_${me.groupCode}_${Date.now()}`, { player: me.name, group: me.groupCode, text: txt, reason: screen.reason, time: new Date().toLocaleTimeString() });
-    return;
-  }
+  if (btn) btn.disabled = true;
   clearInterval(writeTimer);
-  if (btn) { btn.disabled = false; btn.textContent = 'Submit →'; }
   await doSubmitWrite(txt);
+  if (btn) btn.disabled = false;
 }
 
 async function screenContent(txt) {
