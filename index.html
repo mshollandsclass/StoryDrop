@@ -1290,7 +1290,7 @@ function genCode() {
 // ══════════════════════════════════════════════
 async function saveReport(sessionId, sessionName, groups) {
   const licenseKey = localStorage.getItem('storydrop_license');
-  const key = `sd_report_${encodeURIComponent(licenseKey)}_${sessionId}`;
+  const key = `sd_report_${normalizeLicenseKey(licenseKey)}_${sessionId}`;
   const result = await sset(key, { sessionId, sessionName: sessionName || 'Unnamed Session', completedAt: new Date().toISOString(), groups: groups.map(g => ({ code: g.code, players: g.players, teamScore: g.results?.teamScore || 0, verdicts: g.results?.verdicts || [], story: g.results?.story || [], scores: g.results?.scores || {} })) });
   if (!result) console.error('saveReport failed for session:', sessionId);
   else console.log('Report saved:', key);
@@ -1299,7 +1299,7 @@ async function saveReport(sessionId, sessionName, groups) {
 async function loadReports() {
   try {
     const licenseKey = localStorage.getItem('storydrop_license');
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_report_${encodeURIComponent(licenseKey)}_*&select=key,value`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }});
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_report_${normalizeLicenseKey(licenseKey)}_*&select=key,value`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }});
     if (!res.ok) { console.error('loadReports failed:', res.status, await res.text()); return []; }
     const rows = await res.json();
     return rows.map(r => r.value);
@@ -1311,7 +1311,7 @@ async function clearAllReports() {
   const licenseKey = localStorage.getItem('storydrop_license');
   const reports = window._cachedReports || [];
   for (const r of reports) {
-    await sdel(`sd_report_${encodeURIComponent(licenseKey)}_${r.sessionId}`);
+    await sdel(`sd_report_${normalizeLicenseKey(licenseKey)}_${r.sessionId}`);
   }
   toast('All reports cleared');
   showReportsModal();
@@ -1322,7 +1322,7 @@ async function deleteReport(idx) {
   if (!report) return;
   if (!confirm(`Delete report "${report.sessionName}"? This cannot be undone.`)) return;
   const licenseKey = localStorage.getItem('storydrop_license');
-  await sdel(`sd_report_${encodeURIComponent(licenseKey)}_${report.sessionId}`);
+  await sdel(`sd_report_${normalizeLicenseKey(licenseKey)}_${report.sessionId}`);
   toast('Report deleted');
   showReportsModal();
 }
@@ -2079,7 +2079,10 @@ function presNav(dir) { presIdx = Math.max(0, Math.min(presGroups.length-1, pres
 // ══════════════════════════════════════════════
 //  LICENSE
 // ══════════════════════════════════════════════
-function isLicensed() { return !!localStorage.getItem('storydrop_license'); }
+function normalizeLicenseKey(key) {
+  // Strip special chars so the key is safe for Supabase LIKE queries
+  return (key || '').replace(/[^a-zA-Z0-9]/g, '_');
+}
 function teacherEntry() { if (isLicensed()) showView('v-teacher-setup'); else showView('v-license'); }
 
 function updateLicenseLandingUI() {
@@ -2295,7 +2298,7 @@ function toggleGenreSubject() {
 
 async function loadSubjectRow() {
   const licenseKey = localStorage.getItem('storydrop_license');
-  const saved = await sget(`sd_starters_${encodeURIComponent(licenseKey)}`);
+  const saved = await sget(`sd_starters_${normalizeLicenseKey(licenseKey)}`);
   const subjects = (saved && saved._customSubjects) || [];
   const row = document.getElementById('subject-row');
   const noMsg = document.getElementById('no-subjects-msg');
@@ -2320,7 +2323,7 @@ let ssCurrentTab = 'genres';
 
 async function loadStarterSentences() {
   const licenseKey = localStorage.getItem('storydrop_license');
-  const key = `sd_starters_${encodeURIComponent(licenseKey)}`;
+  const key = `sd_starters_${normalizeLicenseKey(licenseKey)}`;
   const saved = await sget(key);
   console.log('Loading starter sentences with key:', key, '| Result:', saved);
   ssCustomSentences = saved || {};
@@ -2452,7 +2455,7 @@ async function deleteSubjectSentence(subjectIdx, sentIdx) {
 async function saveStarterSentences() {
   const licenseKey = localStorage.getItem('storydrop_license');
   if (!licenseKey) { toast('No license key found', true); return false; }
-  const key = `sd_starters_${encodeURIComponent(licenseKey)}`;
+  const key = `sd_starters_${normalizeLicenseKey(licenseKey)}`;
   const result = await sset(key, ssCustomSentences);
   if (!result) { toast('Save failed — check connection', true); return false; }
   return true;
@@ -2460,7 +2463,7 @@ async function saveStarterSentences() {
 
 async function getOpenerForGroup(genre) {
   const licenseKey = localStorage.getItem('storydrop_license');
-  const saved = await sget(`sd_starters_${encodeURIComponent(licenseKey)}`);
+  const saved = await sget(`sd_starters_${normalizeLicenseKey(licenseKey)}`);
   const customs = saved || {};
   if (genre && genre.startsWith('custom_')) {
     const subjectName = genre.replace('custom_', '');
@@ -2674,7 +2677,7 @@ async function deleteCurrentReport() {
   if (!currentResultsReport) return;
   if (!confirm(`Delete report "${currentResultsReport.sessionName}"? This cannot be undone.`)) return;
   const licenseKey = localStorage.getItem('storydrop_license');
-  await sdel(`sd_report_${encodeURIComponent(licenseKey)}_${currentResultsReport.sessionId}`);
+  await sdel(`sd_report_${normalizeLicenseKey(licenseKey)}_${currentResultsReport.sessionId}`);
   toast('Report deleted');
   loadResultsPage();
 }
@@ -2740,7 +2743,7 @@ function saveAccountInfo() { const name = document.getElementById('account-name'
 async function saveCurrentSession(sessionId, sessionName, config) {
   const licenseKey = localStorage.getItem('storydrop_license');
   if (!licenseKey) return;
-  const key = `sd_saved_session_${encodeURIComponent(licenseKey)}_${sessionId}`;
+  const key = `sd_saved_session_${normalizeLicenseKey(licenseKey)}_${sessionId}`;
   await sset(key, { sessionId, sessionName, config, savedAt: new Date().toISOString() });
 }
 
@@ -2748,7 +2751,7 @@ async function loadSavedSessions() {
   const licenseKey = localStorage.getItem('storydrop_license');
   if (!licenseKey) return [];
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_session_${encodeURIComponent(licenseKey)}_*&select=key,value&order=value->savedAt.desc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }});
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_session_${normalizeLicenseKey(licenseKey)}_*&select=key,value&order=value->savedAt.desc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }});
     if (!res.ok) return [];
     const rows = await res.json();
     return rows.map(r => r.value);
@@ -2779,8 +2782,8 @@ function loadSession(s) {
 async function deleteSavedSession(sessionId) {
   if (!confirm('Delete this saved session and its report data?')) return;
   const licenseKey = localStorage.getItem('storydrop_license');
-  await sdel(`sd_saved_session_${encodeURIComponent(licenseKey)}_${sessionId}`);
-  await sdel(`sd_report_${encodeURIComponent(licenseKey)}_${sessionId}`);
+  await sdel(`sd_saved_session_${normalizeLicenseKey(licenseKey)}_${sessionId}`);
+  await sdel(`sd_report_${normalizeLicenseKey(licenseKey)}_${sessionId}`);
   showSavedSessions();
   toast('Session deleted');
 }
