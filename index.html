@@ -1071,21 +1071,28 @@ const ANTHROPIC_KEY = 'YOUR_ANTHROPIC_KEY_HERE';
 const USE_PHP_PROXY = ANTHROPIC_KEY === 'YOUR_ANTHROPIC_KEY_HERE';
 const AI_ENDPOINT = USE_PHP_PROXY ? '/api/api.php' : 'https://api.anthropic.com/v1/messages';
 
+function fetchWithTimeout(url, options, ms = 6000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), ms);
+  return fetch(url, { ...options, signal: controller.signal })
+    .finally(() => clearTimeout(timeout));
+}
+
 async function sget(key) {
   try {
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `${SUPABASE_URL}/rest/v1/store?key=eq.${encodeURIComponent(key)}&select=value`,
       { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
     );
-    if (!res.ok) { console.error('sget failed:', res.status, await res.text()); return null; }
+    if (!res.ok) { console.error('sget failed:', res.status); return null; }
     const rows = await res.json();
     return rows.length ? rows[0].value : null;
-  } catch(e) { console.error('sget error:', e); return null; }
+  } catch(e) { console.error('sget error:', e.name); return null; }
 }
 
 async function sset(key, val) {
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/store`, {
+    const res = await fetchWithTimeout(`${SUPABASE_URL}/rest/v1/store`, {
       method: 'POST',
       headers: {
         'apikey': SUPABASE_KEY,
@@ -1095,18 +1102,14 @@ async function sset(key, val) {
       },
       body: JSON.stringify({ key, value: val, updated_at: new Date().toISOString() })
     });
-    if (!res.ok) {
-      const err = await res.text();
-      console.error('sset failed:', res.status, err);
-      return false;
-    }
+    if (!res.ok) { console.error('sset failed:', res.status); return false; }
     return true;
-  } catch(e) { console.error('sset error:', e); return false; }
+  } catch(e) { console.error('sset error:', e.name); return false; }
 }
 
 async function sdel(key) {
   try {
-    await fetch(
+    await fetchWithTimeout(
       `${SUPABASE_URL}/rest/v1/store?key=eq.${encodeURIComponent(key)}`,
       { method: 'DELETE', headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
     );
@@ -1707,6 +1710,11 @@ async function studentPoll() {
       document.getElementById('wait-msg').textContent = 'Waiting for your Educator/Admin to review submissions…';
       showView('v-wait');
     }
+    if (phase === 'scoring' && curView !== 'v-wait') {
+      document.getElementById('wait-code').textContent = me.groupCode;
+      document.getElementById('wait-msg').textContent = 'Calculating scores…';
+      showView('v-wait');
+    }
     if (phase === 'round_results' && curView !== 'v-round-results') showRoundResults(g);
   }
   if (g.status === 'done') { if (curView !== 'v-final') showFinal(g); }
@@ -1825,6 +1833,9 @@ async function doSubmitWrite(txt) {
 //  VOTE TURN
 // ══════════════════════════════════════════════
 async function autoScoreByVote(g) {
+  // Guard — re-fetch to confirm we're still in scoring phase
+  const fresh = await sget(`sd_group_${me.groupCode}`);
+  if (!fresh || fresh.phase !== 'scoring') return;
   const needsCheck = (g.roundContribs||[]).filter(c => c.round === g.currentRound);
   const verdicts = [];
   needsCheck.forEach(c => {
@@ -1893,12 +1904,13 @@ async function submitVote() {
     g._voteMap[`${me.name}_on_${player}`] = correct;
   });
   await sset(`sd_group_${me.groupCode}`, g);
-  if (g.players.every(p => g.votes[p])) {
+  const allVoted = g.players.every(p => g.votes[p]);
+  if (allVoted) {
+    // Set phase immediately to prevent other players triggering this too
+    g.phase = g.judgeMode === 'student' ? 'scoring' : 'teacher_review';
+    await sset(`sd_group_${me.groupCode}`, g);
     if (g.judgeMode === 'student') {
       await autoScoreByVote(g);
-    } else {
-      g.phase = 'teacher_review';
-      await sset(`sd_group_${me.groupCode}`, g);
     }
   }
   showView('v-wait');
