@@ -2068,8 +2068,8 @@ function presNav(dir) { presIdx = Math.max(0, Math.min(presGroups.length-1, pres
 // ══════════════════════════════════════════════
 function isLicensed() { return !!localStorage.getItem('storydrop_license'); }
 function normalizeLicenseKey(key) {
-  // Strip special chars so the key is safe for Supabase LIKE queries
-  return (key || '').replace(/[^a-zA-Z0-9]/g, '_');
+  // Replace all non-alphanumeric chars with nothing — no underscores (SQL wildcard)
+  return (key || '').replace(/[^a-zA-Z0-9]/g, '');
 }
 function teacherEntry() { if (isLicensed()) showView('v-teacher-setup'); else showView('v-license'); }
 
