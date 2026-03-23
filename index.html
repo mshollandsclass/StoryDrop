@@ -1941,8 +1941,16 @@ async function nextRound() {
   g.currentRound = (g.currentRound || 1) + 1;
   g.currentPlayerIdx = 0;
   g.roundContribs = [];
-  g.votes = {}; g.wordVotes = {}; g._roundVerdicts = null; g.phase = 'write';
+  g.votes = {}; g.wordVotes = {}; g._voteMap = {}; g._roundVerdicts = null; g.phase = 'write';
   await sset(`sd_group_${me.groupCode}`, g);
+  // Immediately navigate — don't wait for poll
+  const isMyTurn = g.players[0] === me.name;
+  if (isMyTurn) { startWriteTurn(g); }
+  else {
+    document.getElementById('wait-code').textContent = me.groupCode;
+    document.getElementById('wait-msg').textContent = `Waiting for ${g.players[0]} to write…`;
+    showView('v-wait');
+  }
 }
 
 async function endGame(g) {
