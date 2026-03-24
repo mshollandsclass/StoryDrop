@@ -1413,15 +1413,26 @@ async function saveSetupSession() {
   const sessionName = document.getElementById('session-name').value.trim();
   if (!sessionName) { toast('Enter a session name first', true); return; }
   if (parsedVocab.length < 1) { toast('Add at least one vocabulary word', true); return; }
+  const licenseKey = localStorage.getItem('storydrop_license');
+  if (!licenseKey) { toast('No license key found', true); return; }
   const tempId = genCode();
-  await saveCurrentSession(tempId, sessionName, {
-    numGroups: parseInt(document.getElementById('num-groups').value)||3,
-    numPlayers: parseInt(document.getElementById('num-players').value)||3,
-    genre: selectedGenre,
-    vocab: parsedVocab,
-    vocabRaw: document.getElementById('vocab-input').value
+  const key = `sd_saved_session_${normalizeLicenseKey(licenseKey)}_${tempId}`;
+  console.log('Saving session with key:', key);
+  const result = await sset(key, {
+    sessionId: tempId,
+    sessionName,
+    config: {
+      numGroups: parseInt(document.getElementById('num-groups').value)||3,
+      numPlayers: parseInt(document.getElementById('num-players').value)||3,
+      genre: selectedGenre,
+      vocab: parsedVocab,
+      vocabRaw: document.getElementById('vocab-input').value
+    },
+    savedAt: new Date().toISOString()
   });
-  toast('Session saved!');
+  console.log('Save result:', result);
+  if (result) { toast('Session saved!'); }
+  else { toast('Save failed — check console', true); }
 }
 
 // ══════════════════════════════════════════════
