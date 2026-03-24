@@ -1075,7 +1075,7 @@ async function sget(key) {
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/store?key=eq.${encodeURIComponent(key)}&select=value`,
-      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } }
+      { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' } }
     );
     if (!res.ok) return null;
     const rows = await res.json();
@@ -2750,7 +2750,7 @@ async function loadSavedSessions() {
   const licenseKey = localStorage.getItem('storydrop_license');
   if (!licenseKey) return [];
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_session_${normalizeLicenseKey(licenseKey)}_%&select=key,value&order=updated_at.desc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }});
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_session_${normalizeLicenseKey(licenseKey)}_%&select=key,value`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }});
     if (!res.ok) return [];
     const rows = await res.json();
     return rows.map(r => r.value);
