@@ -2695,18 +2695,18 @@ async function deleteCurrentReport() {
 }
 
 function downloadResultsCSV() {
-  if (!currentResultsReport) return;
-  // Collect all unique vocab words across the session
+  if (!currentResultsReport) { toast('No report loaded', true); return; }
   const allWords = [];
   (currentResultsReport.groups || []).forEach(g => {
     (g.verdicts || []).forEach(v => { if (v.word && !allWords.includes(v.word)) allWords.push(v.word); });
     (g.story || []).forEach(s => { if (s.word && !allWords.includes(s.word)) allWords.push(s.word); });
   });
-  // Header row — Group Name instead of Class
   const headers = ['Student Name', 'Group', ...allWords, 'Total Correct', 'Accuracy %'];
   const rows = [headers];
   (currentResultsReport.groups || []).forEach(g => {
-    (g.players || []).forEach(player => {
+    // Get unique players from story (more reliable than g.players)
+    const players = [...new Set((g.story||[]).filter(s => s.player !== 'Narrator').map(s => s.player))];
+    players.forEach(player => {
       const verdicts = g.verdicts || [];
       const wordResults = allWords.map(word => {
         const verdict = verdicts.find(v => v.playerName === player && v.word === word);
