@@ -1132,11 +1132,11 @@ async function callAI(prompt, maxTokens = 200) {
 // ══════════════════════════════════════════════
 const BANNED_WORDS = [
   'fuck','fucking','fucked','fucker','shit','shitting','shitty','bitch','bitches',
-  'ass','asshole','bastard','damn','crap','cunt','dick','cock','pussy','piss',
+  'asshole','bastard','cunt','dick','cock','piss',
   'whore','slut','nigger','nigga','faggot','fag','retard','dyke','chink','spic',
-  'wetback','kike','tranny','rape','rapist','molest','pedophile','kill yourself',
-  'kys','suicide','hang yourself','shoot yourself','go die','hate you','i hate',
-  'sex','sexy','porn','naked','boobs','tits','penis','vagina','masturbate','horny'
+  'wetback','kike','tranny','rape','rapist','molest','pedophile',
+  'kill yourself','kys','hang yourself','shoot yourself',
+  'porn','masturbate'
 ];
 
 function containsProfanity(txt) {
@@ -2708,7 +2708,7 @@ function downloadResultsCSV() {
       const totalJudged = wordResults.filter(v => v !== '').length;
       const accuracy = totalJudged > 0 ? ((totalCorrect / totalJudged) * 100).toFixed(1) : '';
       rows.push([
-        player,
+        `"${(player||'').replace(/"/g,'""')}"`,
         g.code,
         ...wordResults,
         totalCorrect,
