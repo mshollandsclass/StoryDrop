@@ -2258,18 +2258,20 @@ function clearSavedSession() { localStorage.removeItem('sd_teacher_session'); lo
 // ══════════════════════════════════════════════
 async function exportCSV() {
   const allCodes = presGroups && presGroups.length ? presGroups.map(g=>g.code) : Array.from(document.querySelectorAll('.gc-code')).map(el=>el.textContent.trim());
-  const rows = [['Group Code','Player Name','Score','Round','Sentence Written','Vocab Word','Word Used','Correct (Group Vote)','Correct (AI Verdict)']];
+  const rows = [['Group Code','Player Name','Score','Sentence Written']];
   for (const code of allCodes) {
     const g = await sget(`sd_group_${code}`);
     if (!g) continue;
     const scores = (g.results||{}).scores||g.scores||{};
     const story = (g.results||{}).story||g.story||[];
-    const verdicts = (g.results||{}).verdicts||[];
-    story.forEach((entry,i) => {
-      const verdict = verdicts.find(v=>v.playerName===entry.playerName&&v.round===entry.round);
-      const votes = g.wordVotes?.[entry.playerName]||[];
-      const groupVote = votes.length?(votes.filter(Boolean).length>votes.length/2?'Yes':'No'):'N/A';
-      rows.push([code,entry.playerName||'',scores[entry.playerName]||0,entry.round||(i+1),`"${(entry.text||'').replace(/"/g,'""')}"`,entry.word?entry.word.word:'',entry.appearsInText?'Yes':'No',groupVote,verdict?(verdict.correct?'Yes':'No'):'N/A']);
+    story.forEach(entry => {
+      if (entry.player === 'Narrator') return;
+      rows.push([
+        code,
+        `"${(entry.player||'').replace(/"/g,'""')}"`,
+        scores[entry.player]||0,
+        `"${(entry.text||'').replace(/"/g,'""')}"`
+      ]);
     });
   }
   const csv = rows.map(r=>r.join(',')).join('\n');
