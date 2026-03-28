@@ -1294,10 +1294,13 @@ async function saveReport(sessionId, sessionName, groups) {
 async function loadReports() {
   try {
     const licenseKey = localStorage.getItem('storydrop_license');
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_report_${normalizeLicenseKey(licenseKey)}_%&select=key,value`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }});
-    if (!res.ok) { console.error('loadReports failed:', res.status, await res.text()); return []; }
+    const nk = normalizeLicenseKey(licenseKey);
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_report_${nk}_%25&select=key,value`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
+    });
+    if (!res.ok) return [];
     const rows = await res.json();
-    return rows.map(r => r.value);
+    return rows.map(r => r.value).filter(Boolean);
   } catch(e) { console.error('loadReports error:', e); return []; }
 }
 
@@ -2750,10 +2753,13 @@ async function loadSavedSessions() {
   const licenseKey = localStorage.getItem('storydrop_license');
   if (!licenseKey) return [];
   try {
-    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_session_${normalizeLicenseKey(licenseKey)}_%&select=key,value`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }});
+    const nk = normalizeLicenseKey(licenseKey);
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/store?key=like.sd_saved_session_${nk}_%25&select=key,value`, {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' }
+    });
     if (!res.ok) return [];
     const rows = await res.json();
-    return rows.map(r => r.value);
+    return rows.map(r => r.value).filter(Boolean);
   } catch { return []; }
 }
 
